@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nagger</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script>
+        function toggleEdit() {
+            var naggers = document.getElementsByClassName("nagger-container");
+            for (var i = 0; i < naggers.length; i++) {
+                var nagger = naggers[i];
+                var severity = nagger.getElementsByClassName("nagger-severity")[0];
+                var dateCreated = nagger.getElementsByClassName("nagger-date-created")[0];
+                var content = nagger.getElementsByClassName("nagger-content")[0];
+                var buttons = nagger.getElementsByClassName("nagger-buttons")[0];
+                if (severity.disabled) {
+                    severity.disabled = false;
+                    dateCreated.contentEditable = true;
+                    content.contentEditable = true;
+                    buttons.style.display = "flex";
+                } else {
+                    severity.disabled = true;
+                    dateCreated.contentEditable = false;
+                    content.contentEditable = false;
+                    buttons.style.display = "none";
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <header class="index-header">
+        <div class="header-link">
+            <a href = "#">EXPORT</a>
+        </div>
+
+        <div class="header-link">
+            <a href = "#">LOAD</a>
+        </div>
+    </header>
+    <main id="index-main">
+        <h1>
+            Your Naggers:
+        </h1>
+       <div class="main-container">
+
+            <div class="nagger-container">
+                <div class="nagger-severity-container">
+                    <div class="severity-label">
+                        <span>Severity:</span>
+                    </div>
+                    <select class="nagger-severity">
+                        <option value="1">mild</option>
+                        <option value="2">medium</option>
+                        <option value="3">severe</option>
+                        <option value="4">aggressive</option>
+                    </select>
+                </div>
+                <div class="nagger-date-created">
+                    <h2>Call a friend</h2>
+                </div>
+                <div class="nagger-content">
+                    <div class="nagger-description-label">
+                        Description:
+                    </div>
+                    <div class="description">Call a friend and ask how they are doing</div>
+                </div>
+                <div class="nagger-buttons">
+                    <button class="nagger-button">Save</button>
+                    <button class="nagger-button">Delete</button>
+                </div>
+            </div>
+
+            <div class="nagger-container">
+                <div class="nagger-severity-container">
+                    <div class="severity-label">
+                        <span>Severity:</span>
+                    </div>
+                    <select class="nagger-severity">
+                        <option value="1">mild</option>
+                        <option value="2">medium</option>
+                        <option value="3">severe</option>
+                        <option value="4">aggressive</option>
+                    </select>
+                </div>
+                <div class="nagger-date-created">
+                    <h2>Task 2</h2>
+                </div>
+                <div class="nagger-content">
+                    <p>Task 2 description</p>
+                </div>
+                <div class="nagger-buttons">
+                    <button class="nagger-button">Save</button>
+                    <button class="nagger-button">Delete</button>
+                </div>
+            </div>
+
+
+
+            <div class="nagger-container">
+                
+                <div class="nagger-severity-container">
+                    <div class="severity-label">
+                        <span>Severity:</span>
+                    </div>
+                    <select class="nagger-severity">
+                        <option value="1">mild</option>
+                        <option value="2">medium</option>
+                        <option value="3">severe</option>
+                        <option value="4">aggressive</option>
+                    </select>
+                </div>
+                <div class="nagger-date-created">
+                    <h2>Task 4</h2>
+                </div>
+                <div class="nagger-content">
+                    <p>Task 4 description</p>
+                </div>
+                <div class="nagger-buttons">
+                    <button class="nagger-button">Save</button>
+                    <button class="nagger-button">Delete</button>
+                </div>
+            </div>
+
+            
+
+       </div>
+       <div id="main-control-buttons-container">
+            <button id="main-control-button">Add Nagger</button>
+            <button id="main-control-button" onclick="toggleEdit()">Toggle Edit</button>
+       </div>
+    </main>
+</body>
+</html>

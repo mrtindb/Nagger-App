@@ -1,0 +1,153 @@
+:root {
+    --white: #ffffff;
+    --dark-blue: #00171f;
+    --dark-blue: #003459;
+    --mid-blue: #007EA7;
+    --light-blue: #00A8E8;
+    --lightest-blue: #B8E0F9;
+    --light-grey: #f8f9fa;
+}
+
+
+body {
+    margin: 0;
+    font-family: Arial;
+}
+
+.index-header {
+    background-color: #f8f9fa;
+    padding: 1em;
+    margin-bottom: 10em;
+    background-color: var(--mid-blue);
+    box-shadow: 0px 2px 1px grey;
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.header-link {
+    color: var(--white);
+    text-decoration: none;
+    margin: 0 1em;
+}
+
+.header-link a {
+
+    font-size: 1.5em;
+    color: var(--white);
+    text-decoration: none;
+}
+
+.header-link a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--white);
+}
+
+#index-main {
+    color: var(--dark-blue);
+    width: 50%;
+    margin: 0 auto;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    padding: 0.2em;
+    border: 0.2em solid var(--mid-blue);
+    border-radius: 10px;
+}
+
+.nagger-container {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    height: 4.6em;
+}
+
+.nagger-container:hover {
+    background-color: var(--light-grey);
+}
+
+.nagger-severity-container {
+    display: flex;
+    align-items: center;
+    height: inherit;
+
+    margin-right: 3em;
+}
+
+.nagger-severity-container select {
+    margin-left: 1em;
+    margin-right: 1em;
+    height: 40%;
+    border: 0.02em solid var(--mid-blue);
+}
+
+.nagger-severity-container select option {
+    padding: 10em;
+}
+
+#main-control-buttons-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    margin-top: 1.5em;
+}
+
+#main-control-buttons-container button,
+.nagger-buttons button {
+    transition-duration: 0.1s;
+    font-size: 0.9em;
+    margin-right: 1em;
+    padding: 0.5em;
+    border-radius: 4px;
+    border: 0.1em solid var(--mid-blue);
+    background-color: var(--mid-blue);
+    color: white;
+}
+
+#main-control-buttons-container button:hover {
+    background-color: white;
+    color: var(--mid-blue);
+}
+
+.nagger-container .nagger-buttons {
+    column-gap: 0.8em;
+    margin-left: auto;
+    margin-right: 1em;
+    height: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+.nagger-content {
+    display: flex;
+    flex-direction: row;
+    column-gap: 2em;
+}
+
+@media screen and (max-width: 600px) {
+
+    .index-header {
+        flex-direction: column;
+        row-gap: 1em;
+        
+    }
+
+    .header-link {
+        text-align: start;
+    }
+
+    #index-main {
+        width: 100%;
+    }
+
+    .main-container {
+        width: 100%;
+    }
+
+    .nagger-container{
+    width: 100%;
+    background-color: var(--mid-blue);
+    }
+}
