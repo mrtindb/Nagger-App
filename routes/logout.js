@@ -7,6 +7,7 @@ const fetch = require('node-fetch');
 const path = require('path');
 
 routes.get('/', async (req, res) => {
-    res.render('home');
+    res.redirect('/login');
 });
+
 module.exports = routes;

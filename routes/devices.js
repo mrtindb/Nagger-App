@@ -5,9 +5,8 @@ const routes = express.Router();
 const fetch = require('node-fetch');
 const path = require('path');
 
-
 routes.get('/', async (req, res) => {
-    res.sendFile(path.join(__dirname, '../resources/devices.html'))
+    res.render('devices')
 });
 
 module.exports = routes;
