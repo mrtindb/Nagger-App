@@ -88,8 +88,14 @@
               <input type="password" class="form-control" id="password" required placeholder="Password">
               <label for="passwordTextField" class="form-label">Password</label>
             </div>
-
-
+            <% if(invalidCredentials) { %>
+            <div class="mb-3">
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                Invalid email or password.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            </div>
+            <% } %>
 
             <button type="submit" class="btn btn-success">Log in</button>
           </form>

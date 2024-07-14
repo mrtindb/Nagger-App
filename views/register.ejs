@@ -75,22 +75,22 @@
       <!-- Main Content -->
       <main class="col">
         <div class="container mx-auto mt-4" id="register-form-container">
-          <form method="POST">
+          <form method="POST" action="/register">
             <h1 class="h3 mb-3 fw-normal">Register</h1>
             
             <div class="mb-3 form-floating">
-              <input type="text" class="form-control" required id="username" required minlength="3" placeholder="Username">
+              <input type="text" class="form-control" required name="username" id="username" required minlength="3" placeholder="Username">
               <label for="usernameTextField" class="form-label">Username</label>
             </div>
             
             <div class="mb-3 form-floating">
-              <input type="email" class="form-control" required id="email" aria-describedby="emailHelp"
+              <input type="text" class="form-control" required name="email" id="email" aria-describedby="emailHelp"
                 placeholder="Enter email">
               <label for="emailTextField" class="form-label">Email Address</label>
             </div>
 
             <div class="mb-3 form-floating">
-              <input type="password" class="form-control" id="password" required minlength="8" placeholder="Password">
+              <input type="password" class="form-control" name="password" id="password" required minlength="8" placeholder="Password">
               <label for="passwordTextField" class="form-label">Password</label>
             </div>
 
