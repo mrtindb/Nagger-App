@@ -14,6 +14,7 @@ const devices = require('./routes/devices');
 const register = require('./routes/register');
 const login = require('./routes/login');
 const logout = require('./routes/logout');
+const account = require('./routes/account');
 const app = express();
 
 
@@ -28,9 +29,11 @@ app.use('/devices', devices);
 app.use('/register', register);
 app.use('/login', login);
 app.use('/logout', logout);
+app.use('/account', account);   
 app.get('/about', (req, res) => {res.render('about')});
 
 const database = require('./database');
+const { req } = require('agent-base');
 database.connectToDatabase();
 
 

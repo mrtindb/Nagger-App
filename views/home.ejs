@@ -34,6 +34,19 @@
       checkTheme(theme);
     });
   </script>
+
+  <script>
+    function addNewNagger(){
+      const title = document.getElementById('titleTextBoxAdd').value;
+      const description = document.getElementById('descriptionTextAreaAdd').value;
+      const severity = document.getElementById('severityDropdownAdd').value;
+      const nagger = {
+        title: title,
+        description: description,
+        severity: severity
+      };
+    }
+  </script>
   <!-- Modal for adding Naggers -->
   <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
@@ -73,7 +86,7 @@
         </div>
         <div class="modal-footer">
 
-          <button type="button" class="btn btn-success">Add</button>
+          <button type="button" class="btn btn-success" onclick="addNewNagger()">Add</button>
         </div>
       </div>
     </div>
@@ -137,83 +150,33 @@
         <div class="container-fluid px-0 text-center">
           <div id="row" class="row g-2 row-cols-2 text-md-center row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5">
             
+            
             <!-- Card -->
+          <% if(naggers.length > 0) { %>
+            <% for(let n of naggers) { %>
             <div class="col d-flex align-items-stretch card-item-column" data-bs-toggle="modal"
-              data-bs-target="#editModal">
+              data-bs-target="#editModal" data-bs-naggerId="<%= n.naggerId %>" data-bs-naggerTitle="<%= n.naggerTitle %>"
+              data-bs-naggerDescription="<%= n.naggerDescription %>" data-bs-naggerDate="<%= n.naggerDate %>">
+
               <div class="text-bg-success shadow card flex-grow-1">
                 <div class="card-content">
                   <div class="card-header">
-                    123456789123456
+                    <%= n.naggerTitle %>
                   </div>
                   <div class="card-body px-2">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Repudiandae velit dicta laborios
-                  </div>
-
-                </div>
-                <div class="card-footer mt-auto mt-auto">
-                  12.03.2024 15:45
-                </div>
-              </div>
-            </div>
-
-            <!-- Card -->
-            <div class="col d-flex align-items-stretch card-item-column" data-bs-toggle="modal"
-              data-bs-target="#editModal">
-              <div class="text-bg-success shadow card flex-grow-1">
-                <div class="card-content">
-                  <div class="card-header">
-                    Title 1
-                  </div>
-                  <div class="card-body px-2">
-                    12345678901234567890123456789012345678901234567890123456789012345678901234567890
-                  </div>
-
-                </div>
-                <div class="card-footer mt-auto mt-auto">
-                  12.03.2024 15:45
-                </div>
-              </div>
-            </div>
-
-            <!-- Card -->
-            <div class="col d-flex align-items-stretch card-item-column" data-bs-toggle="modal"
-              data-bs-target="#editModal">
-              <div class="text-bg-success shadow card flex-grow-1">
-                <div class="card-content">
-                  <div class="card-header">
-                    Title 1
-                  </div>
-                  <div class="card-body px-2">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Repudiandae velit dicta laborios
+                    <%= n.naggerDescription %>
                   </div>
 
                 </div>
                 <div class="card-footer mt-auto">
-                  12.03.2024 15:45
+                  <%= n.naggerDate %>
                 </div>
               </div>
             </div>
-
-            <!-- Card -->
-            <div class="col d-flex align-items-stretch card-item-column" data-bs-toggle="modal"
-              data-bs-target="#editModal">
-              <div class="text-bg-success shadow card flex-grow-1">
-                <div class="card-content">
-                  <div class="card-header">
-                    Title 1
-                  </div>
-                  <div class="card-body px-2">
-                  </div>
-
-                </div>
-                <div class="card-footer mt-auto">
-                  12.03.2024 15:45
-                </div>
-              </div>
-            </div>
+          <% }} %>
 
 
-            <!-- Card -->
+            <!-- Plus Card -->
             <div id="plus-card" data-bs-toggle="modal" data-bs-target="#addModal"
               class="col d-flex align-items-stretch card-item-column">
               <div class="text-bg-white shadow card flex-grow-1 align-content-center justify-content-center">
@@ -224,6 +187,7 @@
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </main>

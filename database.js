@@ -57,4 +57,54 @@ async function extractUserPassword(username, email) {
     return await promise;
 }
 
-module.exports = {connectToDatabase, addUserToDatabase, extractUserPassword};
+async function checkUsernameAvailability(username) {
+    let promise = new Promise((resolve, reject) => {
+        con.query("USE nagger", function(err, result) {
+            if(err) throw err;
+        });
+        con.query(`SELECT username, email FROM users WHERE username = '${username}'`, function(err, result) {
+            if(err) throw err;
+            if(result.length === 0) {
+                resolve(true);
+            }
+            else {
+                resolve(false);
+            }
+        });
+    });
+    return await promise;
+};
+
+async function checkEmailAvailability(email) {
+    let promise = new Promise((resolve, reject) => {
+        con.query("USE nagger", function(err, result) {
+            if(err) throw err;
+        });
+        con.query(`SELECT username, email FROM users WHERE email = '${email}'`, function(err, result) {
+            if(err) throw err;
+            if(result.length === 0) {
+                resolve(true);
+            }
+            else {
+                resolve(false);
+            }
+        });
+    });
+    return await promise;
+};
+
+async function getUserNaggers(userId) {
+    let promise = new Promise((resolve, reject) => {
+        con.query("USE nagger", function(err, result) {
+            if(err) throw err;
+        });
+        con.query(`SELECT user_data FROM users WHERE userId = ${userId}`, function(err, result) {
+            if(err) throw err;
+            resolve(result);
+        });
+    });
+    return await promise;
+
+}
+
+module.exports = {connectToDatabase, addUserToDatabase, extractUserPassword, checkEmailAvailability, checkUsernameAvailability, getUserNaggers};
