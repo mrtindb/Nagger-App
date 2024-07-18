@@ -3,204 +3,353 @@
 
 <%- include('partials/head') %>
 
-<body data-bs-theme="dark">
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-    crossorigin="anonymous"></script>
+  <body data-bs-theme="dark">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+      integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+      crossorigin="anonymous"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var addModal = document.getElementById('addModal');
-      var editModal = document.getElementById('editModal');
-      // Function to be called when the modal is closed
-      function onModalClosed() {
-        document.getElementById('addForm').reset();
-        document.getElementById('editForm').reset();
+      <!-- DOM loaded event listener -->
+    <script>
+      var currentNaggerId;
+      document.addEventListener('DOMContentLoaded', function () {
+        currentNaggerId = -1;
+
+        var addModal = document.getElementById('addModal');
+        var editModal = document.getElementById('editModal');
+        // Function to be called when the modal is closed
+        function onModalClosed() {
+          document.getElementById('addForm').reset();
+          document.getElementById('editForm').reset();
+        }
+
+        // Attach event listener for the modal 'hidden.bs.modal' event
+        addModal.addEventListener('hidden.bs.modal', function () {
+          onModalClosed();
+        });
+
+        editModal.addEventListener('hidden.bs.modal', function () {
+          onModalClosed();
+        });
+        let params = new URLSearchParams(window.location.search);
+        let theme = params.get('theme');
+        checkTheme(theme);
+
+
+        document.getElementById('editModal').addEventListener('show.bs.modal', function (event) {
+          var button = event.relatedTarget;
+          currentNaggerId = button.getAttribute('data-bs-naggerId');
+          var title = button.getAttribute('data-bs-naggerTitle');
+          var description = button.getAttribute('data-bs-naggerDescription');
+          var severity = button.getAttribute('data-bs-severity');
+          document.getElementById('titleTextBoxEdit').value = title;
+          document.getElementById('descriptionTextAreaEdit').value = description;
+          document.getElementById('severityDropdownEdit').value = severity;
+        })
+
+
+
+      });
+    </script>
+
+    <!-- add naggers -->
+    <script>
+      function addNewNagger() {
+        let title = document.getElementById('titleTextBoxAdd').value;
+        let description = document.getElementById('descriptionTextAreaAdd').value;
+        const severity = document.getElementById('severityDropdownAdd').value;
+
+        let now = new Date();
+        let year = now.getFullYear();
+        let month = String(now.getMonth() + 1).padStart(2, '0');
+        let day = String(now.getDate()).padStart(2, '0');
+        let hours = String(now.getHours()).padStart(2, '0');
+        let minutes = String(now.getMinutes()).padStart(2, '0');
+        let formattedDate = `${day}-${month}-${year} ${hours}:${minutes}`;
+
+        if(title==='') title = 'No title';
+        if(description==='') description = 'No description';
+        
+        let nagger = {
+          title: title,
+          description: description,
+          severity: severity || 1,
+          naggerDate: formattedDate
+        };
+        fetch('/addNagger', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(nagger)
+        }).then(response => response.json()).then(data => {
+          
+          let card = document.createElement('div');
+          card.classList.add('col', 'd-flex', 'align-items-stretch', 'card-item-column');
+          card.setAttribute('data-bs-toggle', 'modal');
+          card.setAttribute('data-bs-target', '#editModal');
+          card.setAttribute('data-bs-naggerId', data.newNaggerId);
+          card.setAttribute('data-bs-naggerTitle', title);
+          card.setAttribute('data-bs-naggerDescription', description);
+          card.setAttribute('data-bs-naggerDate', formattedDate);
+          card.setAttribute('data-bs-severity', severity);
+
+          let cardContent = document.createElement('div');
+          cardContent.classList.add('text-bg-success', 'shadow', 'card', 'flex-grow-1');
+
+          let cardHeader = document.createElement('div');
+          cardHeader.classList.add('card-header');
+          cardHeader.textContent = title;
+
+          let cardBody = document.createElement('div');
+          cardBody.classList.add('card-body', 'px-2');
+          cardBody.textContent = description;
+
+          let cardFooter = document.createElement('div');
+          cardFooter.classList.add('card-footer', 'mt-auto');
+          cardFooter.textContent = formattedDate;
+
+          cardContent.appendChild(cardHeader);
+          cardContent.appendChild(cardBody);
+          cardContent.appendChild(cardFooter);
+
+          card.appendChild(cardContent);
+
+          let row = document.getElementById('row');
+          row.insertBefore(card, row.lastElementChild);
+
+        }).catch((error) => {
+          console.error('Error:', error);
+        });
+
+
       }
+    </script>
 
-      // Attach event listener for the modal 'hidden.bs.modal' event
-      addModal.addEventListener('hidden.bs.modal', function () {
-        onModalClosed();
-      });
+    <!-- delete Naggers -->
+     <script>
+        function deleteNagger() {
+          if(currentNaggerId === -1) {
+            return;
+          }
+          fetch(`/deleteNagger/${currentNaggerId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }).then(response => {
+            if(response.ok) {
+              let card = document.querySelector(`[data-bs-naggerId="${currentNaggerId}"]`);
+              card.remove();
+            }
+          }).catch((error) => {
+            console.error('Error:', error);
+          });
+        }
 
-      editModal.addEventListener('hidden.bs.modal', function () {
-        onModalClosed();
-      });
-      let params = new URLSearchParams(window.location.search);
-      let theme = params.get('theme');
-      checkTheme(theme);
-    });
-  </script>
+        function alterNagger() {
+          if(currentNaggerId === -1) {
+            return;
+          }
+          let title = document.getElementById('titleTextBoxEdit').value;
+          let description = document.getElementById('descriptionTextAreaEdit').value;
+          const severity = document.getElementById('severityDropdownEdit').value;
+          if(title==='') title = 'No title';
+          if(description==='') description = 'No description';
 
-  <script>
-    function addNewNagger(){
-      const title = document.getElementById('titleTextBoxAdd').value;
-      const description = document.getElementById('descriptionTextAreaAdd').value;
-      const severity = document.getElementById('severityDropdownAdd').value;
-      const nagger = {
-        title: title,
-        description: description,
-        severity: severity
-      };
-    }
-  </script>
-  <!-- Modal for adding Naggers -->
-  <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="addModalLabel">Add Nagger</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
+
+          fetch(`/alterNagger/${currentNaggerId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              title: title,
+              description: description,
+              severity: severity
+            })
+          }).then(response => {
+            if(response.ok) {
+              const card = document.querySelector(`[data-bs-naggerId="${currentNaggerId}"]`);
+              const cardHeader = card.querySelector('.card-header');
+              const cardBody = card.querySelector('.card-body');
+
+              cardHeader.textContent = title;
+              cardBody.textContent = description;
+
+              card.setAttribute('data-bs-naggerTitle', title);
+              card.setAttribute('data-bs-naggerDescription', description);
+              card.setAttribute('data-bs-severity', severity);
+            }
+          }).catch((error) => {
+            console.error('Error:', error);
+          });
+        }
+     </script>
+
+    <!-- Modal for adding Naggers -->
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="addModalLabel">Add Nagger</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
           <form id="addForm">
-            <div class="mb-3 form-floating">
-              <input type="text" maxlength="15" id="titleTextBoxAdd" class="form-control" placeholder="dd">
-              <label for="titleTextBoxAdd" class="form-label">Title (max. 15 characters)</label>
+            <div class="modal-body">
+
+              <div class="mb-3 form-floating">
+                <input type="text" name="title" maxlength="15" id="titleTextBoxAdd" class="form-control"
+                  placeholder="dd">
+                <label for="titleTextBoxAdd" class="form-label">Title (max. 15 characters)</label>
+
+              </div>
+
+              <div class="mb-3 form-floating">
+                <textarea maxlength="80" name="description" style="height: 8em;" id="descriptionTextAreaAdd"
+                  class="form-control" placeholder="dd"></textarea>
+                <label for="descriptionTextAreaAdd" class="form-label">Description (max. 90 characters)</label>
+
+              </div>
+
+              <div class="mb-3 form-floating">
+
+                <select name="severity" class="form-select" id="severityDropdownAdd" aria-placeholder="dd"
+                  placeholder="dd">
+                  <option value="0">Every 10 minutes</option>
+                  <option value="1">Every 20 minutes</option>
+                  <option value="2">Every hour</option>
+                  <option value="3">Every 2 hours</option>
+                  <option value="4">Every 4 hours</option>
+                  <option value="5">Every 7 hours</option>
+                </select>
+                <label for="severityDropdownAdd" class="form-label">Notification frequency</label>
+              </div>
 
             </div>
+            <div class="modal-footer">
 
-            <div class="mb-3 form-floating">
-              <textarea maxlength="80" style="height: 8em;" id="descriptionTextAreaAdd" class="form-control"
-                placeholder="dd"></textarea>
-              <label for="descriptionTextAreaAdd" class="form-label">Description (max. 90 characters)</label>
+              <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="addNewNagger()">Add</button>
 
-            </div>
-
-            <div class="mb-3 form-floating">
-
-              <select class="form-select" id="severityDropdownAdd" aria-placeholder="dd" placeholder="dd">
-                <option value="0">Every 10 minutes</option>
-                <option value="1">Every 20 minutes</option>
-                <option value="2">Every hour</option>
-                <option value="3">Every 2 hours</option>
-                <option value="4">Every 4 hours</option>
-                <option value="5">Every 7 hours</option>
-              </select>
-              <label for="severityDropdownAdd" class="form-label">Notification frequency</label>
             </div>
           </form>
         </div>
-        <div class="modal-footer">
-
-          <button type="button" class="btn btn-success" onclick="addNewNagger()">Add</button>
-        </div>
       </div>
     </div>
-  </div>
-  <!-- Modal for editing Naggers -->
-  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="editModalLabel">Edit Nagger</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editForm">
-            <div class="mb-3 form-floating">
-              <input type="text" maxlength="15" id="titleTextBoxEdit" class="form-control" placeholder="dd">
-              <label for="titleTextBoxEdit" class="form-label">Title (max. 15 characters)</label>
+    <!-- Modal for editing Naggers -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="editModalLabel">Edit Nagger</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="editForm">
+              <div class="mb-3 form-floating">
+                <input type="text" maxlength="15" id="titleTextBoxEdit" class="form-control" placeholder="dd">
+                <label for="titleTextBoxEdit" class="form-label">Title (max. 15 characters)</label>
 
-            </div>
-
-            <div class="mb-3 form-floating">
-              <textarea maxlength="80" style="height: 8em;" id="descriptionTextAreaEdit" class="form-control"
-                placeholder="dd"></textarea>
-              <label for="descriptionTextAreaEdit" class="form-label">Description (max. 90 characters)</label>
-
-            </div>
-
-            <div class="mb-3 form-floating">
-
-              <select class="form-select" id="severityDropdownEdit" aria-placeholder="dd" placeholder="dd">
-                <option value="0">Every 10 minutes</option>
-                <option value="1">Every 20 minutes</option>
-                <option value="2">Every hour</option>
-                <option value="3">Every 2 hours</option>
-                <option value="4">Every 4 hours</option>
-                <option value="5">Every 7 hours</option>
-              </select>
-              <label for="severityDropdownEdit" class="form-label">Notification frequency</label>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
-          <button type="button" class="btn btn-success" data-bs-dismiss="modal">Save changes</button>
-
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- top header-->
-    <%- include('partials/header') %>
-  <!-- Main Container -->
-  <div class="container-fluid" style="min-height: 40em;">
-
-    <div class="row">
-
-      <!-- Navbar/Navdrawer -->
-        <%- include('partials/navdrawer') %>
-      <!-- Main Content -->
-      <main class="col-md-9 col-lg-10 px-2 px-md-4 py-2 py-md-4">
-        <div class="container-fluid px-0 text-center">
-          <div id="row" class="row g-2 row-cols-2 text-md-center row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5">
-            
-            
-            <!-- Card -->
-          <% if(naggers.length > 0) { %>
-            <% for(let n of naggers) { %>
-            <div class="col d-flex align-items-stretch card-item-column" data-bs-toggle="modal"
-              data-bs-target="#editModal" data-bs-naggerId="<%= n.naggerId %>" data-bs-naggerTitle="<%= n.naggerTitle %>"
-              data-bs-naggerDescription="<%= n.naggerDescription %>" data-bs-naggerDate="<%= n.naggerDate %>">
-
-              <div class="text-bg-success shadow card flex-grow-1">
-                <div class="card-content">
-                  <div class="card-header">
-                    <%= n.naggerTitle %>
-                  </div>
-                  <div class="card-body px-2">
-                    <%= n.naggerDescription %>
-                  </div>
-
-                </div>
-                <div class="card-footer mt-auto">
-                  <%= n.naggerDate %>
-                </div>
               </div>
-            </div>
-          <% }} %>
 
+              <div class="mb-3 form-floating">
+                <textarea maxlength="80" style="height: 8em;" id="descriptionTextAreaEdit" class="form-control"
+                  placeholder="dd"></textarea>
+                <label for="descriptionTextAreaEdit" class="form-label">Description (max. 90 characters)</label>
 
-            <!-- Plus Card -->
-            <div id="plus-card" data-bs-toggle="modal" data-bs-target="#addModal"
-              class="col d-flex align-items-stretch card-item-column">
-              <div class="text-bg-white shadow card flex-grow-1 align-content-center justify-content-center">
-                <div class="card-content text-bg-white">
-
-                  <i class="bi bi-plus align-self-center" style="font-size:4em"></i>
-
-                </div>
               </div>
-            </div>
+
+              <div class="mb-3 form-floating">
+
+                <select class="form-select" id="severityDropdownEdit" aria-placeholder="dd" placeholder="dd">
+                  <option value="0">Every 10 minutes</option>
+                  <option value="1">Every 20 minutes</option>
+                  <option value="2">Every hour</option>
+                  <option value="3">Every 2 hours</option>
+                  <option value="4">Every 4 hours</option>
+                  <option value="5">Every 7 hours</option>
+                </select>
+                <label for="severityDropdownEdit" class="form-label">Notification frequency</label>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="deleteNagger()" id="deleteButton">Delete</button>
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="saveButton" onclick="alterNagger()">Save changes</button>
 
           </div>
         </div>
-      </main>
+      </div>
     </div>
-  </div>
+    <!-- top header-->
+    <%- include('partials/header') %>
+      <!-- Main Container -->
+      <div class="container-fluid" style="min-height: 40em;">
 
-  <!-- Footer -->
-    <%- include('partials/footer') %>
+        <div class="row">
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
-    integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
-    crossorigin="anonymous"></script>
-  <script src="dashboard.js"></script>
-</body>
+          <!-- Navbar/Navdrawer -->
+          <%- include('partials/navdrawer') %>
+            <!-- Main Content -->
+            <main class="col-md-9 col-lg-10 px-2 px-md-4 py-2 py-md-4">
+              <div class="container-fluid px-0 text-center">
+                <div id="row" class="row g-2 row-cols-2 text-md-center row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5">
+
+
+                  <!-- Card -->
+                  <% if(naggers!==false) { %>
+                    <% for(let n of naggers) { %>
+                      <div class="col d-flex align-items-stretch card-item-column" data-bs-toggle="modal"
+                        data-bs-target="#editModal" data-bs-naggerId="<%= n.naggerId %>"
+                        data-bs-naggerTitle="<%= n.title %>" data-bs-naggerDescription="<%= n.description %>"
+                        data-bs-naggerDate="<%= n.naggerDate %>" data-bs-naggerId=<%= n.naggerId%> data-bs-severity="<%= n.severity %>">
+
+                        <div class="text-bg-success shadow card flex-grow-1">
+                          <div class="card-content">
+                            <div class="card-header">
+                              <%= n.title %>
+                            </div>
+                            <div class="card-body px-2">
+                              <%= n.description %>
+                            </div>
+
+                          </div>
+                          <div class="card-footer mt-auto">
+                            <%= n.naggerDate %>
+                          </div>
+                        </div>
+                      </div>
+                      <% }} %>
+
+
+                        <!-- Plus Card -->
+                        <div id="plus-card" data-bs-toggle="modal" data-bs-target="#addModal"
+                          class="col d-flex align-items-stretch card-item-column">
+                          <div
+                            class="text-bg-white shadow card flex-grow-1 align-content-center justify-content-center">
+                            <div class="card-content text-bg-white">
+
+                              <i class="bi bi-plus align-self-center" style="font-size:4em"></i>
+
+                            </div>
+                          </div>
+                        </div>
+
+                </div>
+              </div>
+            </main>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <%- include('partials/footer') %>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
+          integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
+          crossorigin="anonymous"></script>
+        <script src="dashboard.js"></script>
+  </body>
 
 </html>
