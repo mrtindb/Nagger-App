@@ -15,8 +15,14 @@ const register = require('./routes/register');
 const login = require('./routes/login');
 const logout = require('./routes/logout');
 const account = require('./routes/account');
+const webpush = require('web-push');
 const app = express();
 
+webpush.setVapidDetails(
+    `mailto:${process.env.EMAIL}`,
+    process.env.PUBLIC_VAPID_KEY,
+    process.env.PRIVATE_VAPID_KEY
+);
 
 app.use(express.json());
 app.use(cookieParser());

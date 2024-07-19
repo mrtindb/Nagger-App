@@ -3,9 +3,11 @@
 
 const express = require('express');
 const routes = express.Router();
+const webpush = require('web-push');
 const jwtMiddleware = require('../jwtMiddleware');
 const { getUserNaggers, addNagger, deleteNagger, alterNagger } = require('../database');
-
+const { escapeUserInput } = require('../escaping');
+const { escape } = require('mysql2');
 routes.get('/', jwtMiddleware, async (req, res) => {
 
     const userData = req.user;
@@ -14,7 +16,6 @@ routes.get('/', jwtMiddleware, async (req, res) => {
         res.render('home', { naggers: false });
     }
     else {
-        console.log(naggers);
         res.render('home', { naggers });
     }
 });
@@ -31,9 +32,9 @@ routes.put('/addNagger', jwtMiddleware, async (req, res) => {
     let naggerDate = req.body.naggerDate || new Date();
   
     let nagger = {
-        title: naggerTitle,
-        description: naggerDescription,
-        severity: naggerSeverity,
+        title: escapeUserInput(naggerTitle),
+        description: escapeUserInput(naggerDescription),
+        severity:  naggerSeverity,
         naggerDate: naggerDate
     };
     
@@ -73,8 +74,8 @@ routes.post('/alterNagger/:id', jwtMiddleware, async (req, res) => {
 
     let newNagger = 
     {
-        title: naggerTitle,
-        description: naggerDescription,
+        title: escapeUserInput( naggerTitle ),
+        description: escapeUserInput(naggerDescription),
         severity: naggerSeverity
     }
 
@@ -88,5 +89,28 @@ routes.post('/alterNagger/:id', jwtMiddleware, async (req, res) => {
         res.status(400).send('Bad Request');
     }
 });
+
+
+let subscriptions = [];
+routes.post('/subscribe', (req, res) => {
+    const subscription = req.body;
+    subscriptions.push(subscription);
+    res.status(201).json({});
+  });
+
+  routes.post('/sendNotification', (req, res) => {
+    const notificationPayload = {
+      title: 'New Notification',
+      body: 'This is the body of the notification',
+      url: 'https://google.com',
+    };
+  
+    const promises = subscriptions.map(sub => {
+      return webpush.sendNotification(sub, JSON.stringify(notificationPayload));
+    });
+  
+    Promise.all(promises).then(() => res.sendStatus(200));
+  });
+
 
 module.exports = routes;

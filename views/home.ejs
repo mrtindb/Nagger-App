@@ -11,7 +11,7 @@
       integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
       crossorigin="anonymous"></script>
 
-      <!-- DOM loaded event listener -->
+    <!-- DOM loaded event listener -->
     <script>
       var currentNaggerId;
       document.addEventListener('DOMContentLoaded', function () {
@@ -37,7 +37,6 @@
         let theme = params.get('theme');
         checkTheme(theme);
 
-
         document.getElementById('editModal').addEventListener('show.bs.modal', function (event) {
           var button = event.relatedTarget;
           currentNaggerId = button.getAttribute('data-bs-naggerId');
@@ -49,7 +48,15 @@
           document.getElementById('severityDropdownEdit').value = severity;
         })
 
-
+        // Register service worker
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+          navigator.serviceWorker.register('/service-worker.js').then(function (registration) {
+            console.log('Service Worker registered with scope:', registration.scope);
+            subscribeUserToPushNotifications();
+          }).catch(function (error) {
+            console.error('Service Worker registration failed:', error);
+          });
+        }
 
       });
     </script>
@@ -69,9 +76,9 @@
         let minutes = String(now.getMinutes()).padStart(2, '0');
         let formattedDate = `${day}-${month}-${year} ${hours}:${minutes}`;
 
-        if(title==='') title = 'No title';
-        if(description==='') description = 'No description';
-        
+        if (title === '') title = 'No title';
+        if (description === '') description = 'No description';
+
         let nagger = {
           title: title,
           description: description,
@@ -85,7 +92,7 @@
           },
           body: JSON.stringify(nagger)
         }).then(response => response.json()).then(data => {
-          
+
           let card = document.createElement('div');
           card.classList.add('col', 'd-flex', 'align-items-stretch', 'card-item-column');
           card.setAttribute('data-bs-toggle', 'modal');
@@ -129,65 +136,119 @@
     </script>
 
     <!-- delete Naggers -->
-     <script>
-        function deleteNagger() {
-          if(currentNaggerId === -1) {
-            return;
-          }
-          fetch(`/deleteNagger/${currentNaggerId}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }).then(response => {
-            if(response.ok) {
-              let card = document.querySelector(`[data-bs-naggerId="${currentNaggerId}"]`);
-              card.remove();
-            }
-          }).catch((error) => {
-            console.error('Error:', error);
-          });
+    <script>
+      function deleteNagger() {
+        if (currentNaggerId === -1) {
+          return;
         }
-
-        function alterNagger() {
-          if(currentNaggerId === -1) {
-            return;
+        fetch(`/deleteNagger/${currentNaggerId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
           }
-          let title = document.getElementById('titleTextBoxEdit').value;
-          let description = document.getElementById('descriptionTextAreaEdit').value;
-          const severity = document.getElementById('severityDropdownEdit').value;
-          if(title==='') title = 'No title';
-          if(description==='') description = 'No description';
+        }).then(response => {
+          if (response.ok) {
+            let card = document.querySelector(`[data-bs-naggerId="${currentNaggerId}"]`);
+            card.remove();
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+        });
+      }
 
-
-          fetch(`/alterNagger/${currentNaggerId}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              title: title,
-              description: description,
-              severity: severity
-            })
-          }).then(response => {
-            if(response.ok) {
-              const card = document.querySelector(`[data-bs-naggerId="${currentNaggerId}"]`);
-              const cardHeader = card.querySelector('.card-header');
-              const cardBody = card.querySelector('.card-body');
-
-              cardHeader.textContent = title;
-              cardBody.textContent = description;
-
-              card.setAttribute('data-bs-naggerTitle', title);
-              card.setAttribute('data-bs-naggerDescription', description);
-              card.setAttribute('data-bs-severity', severity);
-            }
-          }).catch((error) => {
-            console.error('Error:', error);
-          });
+      function alterNagger() {
+        if (currentNaggerId === -1) {
+          return;
         }
-     </script>
+        let title = document.getElementById('titleTextBoxEdit').value;
+        let description = document.getElementById('descriptionTextAreaEdit').value;
+        const severity = document.getElementById('severityDropdownEdit').value;
+        if (title === '') title = 'No title';
+        if (description === '') description = 'No description';
+
+
+        fetch(`/alterNagger/${currentNaggerId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            title: title,
+            description: description,
+            severity: severity
+          })
+        }).then(response => {
+          if (response.ok) {
+            const card = document.querySelector(`[data-bs-naggerId="${currentNaggerId}"]`);
+            const cardHeader = card.querySelector('.card-header');
+            const cardBody = card.querySelector('.card-body');
+
+            cardHeader.textContent = title;
+            cardBody.textContent = description;
+
+            card.setAttribute('data-bs-naggerTitle', title);
+            card.setAttribute('data-bs-naggerDescription', description);
+            card.setAttribute('data-bs-severity', severity);
+          }
+        }).catch((error) => {
+          console.error('Error:', error);
+        });
+      }
+    </script>
+
+    <!-- Request push notifications -->
+    <script>
+
+      function sendSubscriptionToServer(subscription) {
+        return fetch('/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(subscription)
+        });
+      }
+
+      function subscribeUserToPushNotifications() {
+        navigator.serviceWorker.ready.then(function (registration) {
+          return registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array('BDc4tPwlYDOyk7AWjeVOWnnlHMh0_IieE7uMb0g-ertvHKhf-sFKgR5_enTsTU5Pzpxq2rreqkka3T0-MsY5Q5Y')
+          });
+        }).then(function (subscription) {
+          console.log('User is subscribed:', subscription);
+          sendSubscriptionToServer(subscription);
+        }).catch(function (error) {
+          console.error('Failed to subscribe the user: ', error);
+        });
+      }
+
+      function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding)
+          .replace(/\-/g, '+')
+          .replace(/_/g, '/');
+
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+
+        for (let i = 0; i < rawData.length; ++i) {
+          outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+      }
+
+      function triggerNotification() {
+        fetch('/sendNotification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        });
+      };
+
+    </script>
 
     <!-- Modal for adding Naggers -->
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
@@ -231,7 +292,8 @@
             </div>
             <div class="modal-footer">
 
-              <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="addNewNagger()">Add</button>
+              <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                onclick="addNewNagger()">Add</button>
 
             </div>
           </form>
@@ -276,8 +338,10 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="deleteNagger()" id="deleteButton">Delete</button>
-            <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="saveButton" onclick="alterNagger()">Save changes</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="deleteNagger()"
+              id="deleteButton">Delete</button>
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="saveButton"
+              onclick="alterNagger()">Save changes</button>
 
           </div>
         </div>
@@ -304,22 +368,23 @@
                       <div class="col d-flex align-items-stretch card-item-column" data-bs-toggle="modal"
                         data-bs-target="#editModal" data-bs-naggerId="<%= n.naggerId %>"
                         data-bs-naggerTitle="<%= n.title %>" data-bs-naggerDescription="<%= n.description %>"
-                        data-bs-naggerDate="<%= n.naggerDate %>" data-bs-naggerId=<%= n.naggerId%> data-bs-severity="<%= n.severity %>">
+                        data-bs-naggerDate="<%= n.naggerDate %>" data-bs-naggerId=<%=n.naggerId%> data-bs-severity="<%=
+                          n.severity %>">
 
-                        <div class="text-bg-success shadow card flex-grow-1">
-                          <div class="card-content">
-                            <div class="card-header">
-                              <%= n.title %>
-                            </div>
-                            <div class="card-body px-2">
-                              <%= n.description %>
-                            </div>
+                          <div class="text-bg-success shadow card flex-grow-1">
+                            <div class="card-content">
+                              <div class="card-header">
+                                <%= n.title %>
+                              </div>
+                              <div class="card-body px-2">
+                                <%= n.description %>
+                              </div>
 
+                            </div>
+                            <div class="card-footer mt-auto">
+                              <%= n.naggerDate %>
+                            </div>
                           </div>
-                          <div class="card-footer mt-auto">
-                            <%= n.naggerDate %>
-                          </div>
-                        </div>
                       </div>
                       <% }} %>
 
@@ -336,6 +401,7 @@
                             </div>
                           </div>
                         </div>
+                        <button class="btn btn-primary" onclick="triggerNotification()">Trigger Notification</button>
 
                 </div>
               </div>

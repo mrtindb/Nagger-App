@@ -44,4 +44,4 @@ function escapeUserInput(inputString) {
     });
 }
 
-module.exports = escapeUserInput;
+module.exports = {escapeUserInput};
