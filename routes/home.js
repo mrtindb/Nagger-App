@@ -94,7 +94,6 @@ routes.post('/alterNagger/:id', jwtMiddleware, async (req, res) => {
 var s;
 routes.post('/subscribe', (req, res) => {
     s = req.body;
-    console.log(s);
     res.status(201).json({});
   });
 

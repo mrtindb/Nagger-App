@@ -1,7 +1,7 @@
 const mysql = require('mysql2');
 
 var con = mysql.createConnection({
-    host: "localhost",
+    host: process.env.DB_HOST,
     user: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
 });
@@ -10,7 +10,7 @@ function connectToDatabase() {
     con.connect(function (err) {
         if (err) throw err;
     })
-    con.query("USE nagger", function (err, result) {
+    con.query("USE dbnagger", function (err, result) {
         if (err) throw err;
     })
 }
