@@ -7,7 +7,8 @@ const webpush = require('web-push');
 const jwtMiddleware = require('../jwtMiddleware');
 const { getUserNaggers, addNagger, deleteNagger, alterNagger } = require('../database');
 const { escapeUserInput } = require('../escaping');
-const { escape } = require('mysql2');
+const useragent = require('express-useragent');
+
 routes.get('/', jwtMiddleware, async (req, res) => {
 
     const userData = req.user;
@@ -90,26 +91,25 @@ routes.post('/alterNagger/:id', jwtMiddleware, async (req, res) => {
     }
 });
 
-
-let subscriptions = [];
+var s;
 routes.post('/subscribe', (req, res) => {
-    const subscription = req.body;
-    subscriptions.push(subscription);
+    s = req.body;
+    console.log(s);
     res.status(201).json({});
   });
 
   routes.post('/sendNotification', (req, res) => {
+    const userAgent = req.useragent;
     const notificationPayload = {
-      title: 'New Notification',
+      title: userAgent.browser + ' ' + userAgent.platform,
       body: 'This is the body of the notification',
       url: 'https://google.com',
     };
   
-    const promises = subscriptions.map(sub => {
-      return webpush.sendNotification(sub, JSON.stringify(notificationPayload));
-    });
-  
-    Promise.all(promises).then(() => res.sendStatus(200));
+
+     webpush.sendNotification(s, JSON.stringify(notificationPayload));
+    res.status(201).json({});
+
   });
 
 

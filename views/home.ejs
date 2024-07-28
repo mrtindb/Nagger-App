@@ -14,6 +14,18 @@
     <!-- DOM loaded event listener -->
     <script>
       var currentNaggerId;
+      function registerServiceWorker() {
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+          navigator.serviceWorker.register('/service-worker.js').then(function (registration) {
+            console.log('Service Worker registered with scope:', registration.scope);
+            subscribeUserToPushNotifications();
+
+          }).catch(function (error) {
+            console.error('Service Worker registration failed:', error);
+          });
+        }
+
+      };
       document.addEventListener('DOMContentLoaded', function () {
         currentNaggerId = -1;
 
@@ -49,15 +61,8 @@
         })
 
         // Register service worker
-        if ('serviceWorker' in navigator && 'PushManager' in window) {
-          navigator.serviceWorker.register('/service-worker.js').then(function (registration) {
-            console.log('Service Worker registered with scope:', registration.scope);
-            subscribeUserToPushNotifications();
-          }).catch(function (error) {
-            console.error('Service Worker registration failed:', error);
-          });
-        }
 
+      registerServiceWorker();
       });
     </script>
 
@@ -402,7 +407,7 @@
                           </div>
                         </div>
                         <button class="btn btn-primary" onclick="triggerNotification()">Trigger Notification</button>
-
+                        <button class="btn btn-primary" onclick="registerServiceWorker()">Subscribe</button>
                 </div>
               </div>
             </main>

@@ -16,6 +16,7 @@ const login = require('./routes/login');
 const logout = require('./routes/logout');
 const account = require('./routes/account');
 const webpush = require('web-push');
+const useragent = require('express-useragent');
 const app = express();
 
 webpush.setVapidDetails(
@@ -29,6 +30,7 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'resources')));
+app.use(useragent.express());
 app.use('/', home);
 app.use('/home', home);
 app.use('/devices', devices);
@@ -44,3 +46,5 @@ database.connectToDatabase();
 
 
 module.exports = app;
+
+setInterval(() => {}, )
