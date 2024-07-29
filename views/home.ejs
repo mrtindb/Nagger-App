@@ -15,15 +15,32 @@
     <script>
       var currentNaggerId;
       function registerServiceWorker() {
-        if ('serviceWorker' in navigator && 'PushManager' in window) {
-          navigator.serviceWorker.register('/service-worker.js').then(function (registration) {
-            console.log('Service Worker registered with scope:', registration.scope);
-            subscribeUserToPushNotifications();
 
-          }).catch(function (error) {
-            console.error('Service Worker registration failed:', error);
+        if ('Notification' in window && navigator.serviceWorker) {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+
+              if ('serviceWorker' in navigator && 'PushManager' in window) {
+                navigator.serviceWorker.register('/service-worker.js').then(function (registration) {
+                  console.log('Service Worker registered with scope:', registration.scope);
+                  subscribeUserToPushNotifications();
+
+                }).catch(function (error) {
+                  console.error('Service Worker registration failed:', error);
+                });
+              }
+              else {
+               alert('Service Worker and PushManager are not supported in this browser. Please use a different browser.');
+              }
+
+            } else {
+              // Permissions denied, notify user
+              alert('Notifications are disabled. Please enable them in your browser settings.');
+            }
           });
         }
+
+
 
       };
       document.addEventListener('DOMContentLoaded', function () {
@@ -62,7 +79,7 @@
 
         // Register service worker
 
-      registerServiceWorker();
+        //registerServiceWorker();
       });
     </script>
 
