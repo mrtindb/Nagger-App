@@ -47,4 +47,4 @@ database.connectToDatabase();
 
 module.exports = app;
 
-setInterval(() => {}, )
+//setInterval(() => {}, )
