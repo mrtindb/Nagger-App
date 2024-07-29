@@ -15,8 +15,13 @@
     <script>
       var currentNaggerId;
       function registerServiceWorker() {
+        if('Notification' in window) alert('Notification in window');
+        if(navigator.serviceWorker) alert('navigator.serviceWorker');
+        if('serviceWorker' in navigator) alert('serviceWorker in navigator');
+        if('PushManager' in window) alert('PushManager in window');
+        
 
-        if ('Notification' in window && navigator.serviceWorker) {
+        if ('Notification' in window && (navigator.serviceWorker || 'serviceWorker' in navigator)) {
           Notification.requestPermission().then(permission => {
             if (permission === 'granted') {
 
