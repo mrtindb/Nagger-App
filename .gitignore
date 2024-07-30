@@ -1,3 +1,5 @@
 node_modules/
 SSL/
 .env
+database.js
+server.js

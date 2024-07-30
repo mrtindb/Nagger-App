@@ -39,7 +39,7 @@ app.use('/login', login);
 app.use('/logout', logout);
 app.use('/account', account);   
 app.get('/about', (req, res) => {res.render('about')});
-
+app.use('/setup', require('./routes/setup'));
 const database = require('./database');
 const { req } = require('agent-base');
 database.connectToDatabase();

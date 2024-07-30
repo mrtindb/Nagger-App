@@ -15,10 +15,6 @@
     <script>
       var currentNaggerId;
       function registerServiceWorker() {
-        if('Notification' in window) alert('Notification in window');
-        if(navigator.serviceWorker) alert('navigator.serviceWorker'); //iOS supported
-        if('serviceWorker' in navigator) alert('serviceWorker in navigator'); //iOS supported
-        if('PushManager' in window) alert('PushManager in window');
 
 
         if ('Notification' in window && (navigator.serviceWorker || 'serviceWorker' in navigator)) {
@@ -27,7 +23,7 @@
 
               if ('serviceWorker' in navigator && 'PushManager' in window) {
                 navigator.serviceWorker.register('/service-worker.js').then(function (registration) {
-                  console.log('Service Worker registered with scope:', registration.scope);
+
                   subscribeUserToPushNotifications();
 
                 }).catch(function (error) {
@@ -35,12 +31,12 @@
                 });
               }
               else {
-               alert('Service Worker and PushManager are not supported in this browser. Please use a different browser.');
+                alert('Service Worker and PushManager are not supported in this browser. Please use a different browser.');
               }
 
             } else {
               // Permissions denied, notify user
-              alert('Notifications are disabled. Please enable them in your browser settings.'+permission);
+              alert('Notifications are disabled. Please enable them in your browser settings.' + permission);
             }
           });
         }
@@ -50,6 +46,32 @@
 
       };
       document.addEventListener('DOMContentLoaded', function () {
+        let setupAlert = document.getElementById('setupAlert');
+
+        if ('serviceWorker' in navigator) {
+          let isRegistered = false;
+          navigator.serviceWorker.getRegistrations().then(function (registrations) {
+
+            for (let registration of registrations) {
+              
+              if (registration && registration.active && registration.active.scriptURL === 'https://localhost:3000/service-worker.js') {
+                isRegistered = true;
+                break;
+              }
+            }
+            if (!isRegistered) {
+           
+           setupAlert.classList.add('d-flex');
+
+         }
+
+         else setupAlert.classList.add('d-none');
+          })
+          
+        }
+
+
+
         currentNaggerId = -1;
 
         var addModal = document.getElementById('addModal');
@@ -244,7 +266,7 @@
             applicationServerKey: urlBase64ToUint8Array('BDc4tPwlYDOyk7AWjeVOWnnlHMh0_IieE7uMb0g-ertvHKhf-sFKgR5_enTsTU5Pzpxq2rreqkka3T0-MsY5Q5Y')
           });
         }).then(function (subscription) {
-          console.log('User is subscribed:', subscription);
+    
           sendSubscriptionToServer(subscription);
         }).catch(function (error) {
           console.error('Failed to subscribe the user: ', error);
@@ -387,6 +409,13 @@
             <!-- Main Content -->
             <main class="col-md-9 col-lg-10 px-2 px-md-4 py-2 py-md-4">
               <div class="container-fluid px-0 text-center">
+
+                <div class="alert alert-warning align-items-start justify-content-start" id="setupAlert" role="alert">
+
+                  <div>
+                    <i class="bi bi-exclamation-triangle"></i> You need to <a href="setup">setup</a> the app before you can use its features.
+                  </div>
+                </div>
                 <div id="row" class="row g-2 row-cols-2 text-md-center row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5">
 
 
@@ -440,10 +469,6 @@
       <!-- Footer -->
       <%- include('partials/footer') %>
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
-          integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
-          crossorigin="anonymous"></script>
-        <script src="dashboard.js"></script>
   </body>
 
 </html>
