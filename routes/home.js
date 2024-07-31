@@ -7,12 +7,13 @@ const webpush = require('web-push');
 const jwtMiddleware = require('../jwtMiddleware');
 const { getUserNaggers, addNagger, deleteNagger, alterNagger, addDevice } = require('../database');
 const { escapeUserInput } = require('../escaping');
-const useragent = require('express-useragent');
+const { v4: uuidv4 } = require('uuid');
 
 routes.get('/', jwtMiddleware, async (req, res) => {
 
     const userData = req.user;
     const naggers = await getUserNaggers(userData.userId);
+    console.log(naggers);
     if (naggers.length === 0) {
         res.render('home', { naggers: false });
     }
@@ -95,7 +96,7 @@ var s;
 routes.post('/subscribe', jwtMiddleware,  async (req, res) => {
 
     s = req.body;
-    //console.log(s);
+    console.log(s);
     let deviceID = req.cookies.deviceID;
     if (!deviceID) {
 

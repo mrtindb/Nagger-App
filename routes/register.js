@@ -6,7 +6,6 @@ const routes = express.Router();
 const createJwt = require('../createjwt');
 const { addUserToDatabase, checkEmailAvailability, checkUsernameAvailability, addDevice } = require('../database');
 const { hashPassword } = require('../passwordhashing');
-const { v4: uuidv4 } = require('uuid');
 
 routes.get('/', async (req, res) => {
     res.render('register', {errorFlag: false, errorMessage: ""});
@@ -14,7 +13,7 @@ routes.get('/', async (req, res) => {
 
 routes.post('/', async (req, res) => {
     const {username, email, password} = req.body;
-
+    const deviceID = req.cookies.deviceID;
     
     //TODO: Add validation for incoming data
 
@@ -41,7 +40,14 @@ routes.post('/', async (req, res) => {
     const token = createJwt(user, username, email);
 
     res.cookie('jwt', token, {httpOnly: true, secure: true});
-    
+    /*
+    if(!deviceID){
+        deviceID = uuidv4();
+    }
+        const expiryDate = new Date(2037, 0, 1);
+        res.cookie('deviceID', deviceID, {httpOnly:true, secure:true, expires: expiryDate});
+        await addDevice(user, deviceID, req.useragent);
+    */
     
     res.redirect('/home');
 });

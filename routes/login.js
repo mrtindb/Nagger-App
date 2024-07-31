@@ -4,7 +4,7 @@
 const express = require('express');
 const routes = express.Router();
 const { comparePasswords } = require('../passwordhashing');
-const { extractUserPassword } = require('../database');
+const { extractUserPassword, addDevice } = require('../database');
 const createJwt = require('../createjwt');
 const { v4: uuidv4 } = require('uuid');
 
@@ -30,13 +30,14 @@ routes.post('/', async (req, res) => {
     if(match) {
         const token = createJwt(userId, username, email);
         res.cookie('jwt', token, {httpOnly: true, secure: true});
-
+/*
         if(!deviceID){
             deviceID = uuidv4();
+        }
             const expiryDate = new Date(2037, 0, 1);
             res.cookie('deviceID', deviceID, {httpOnly:true, secure:true, expires: expiryDate});
-        }
-
+            await addDevice(userId, deviceID, req.useragent);
+*/
         res.redirect('/home');
     }
     else {

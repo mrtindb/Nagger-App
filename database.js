@@ -1,5 +1,7 @@
-const mysql = require('mysql2');
+'use strict';
 
+const mysql = require('mysql2');
+const nextExecution = require('./scheduler');
 var con = mysql.createConnection({
     host: process.env.DB_LOCALHOST,
     user: process.env.DB_USERNAME,
@@ -115,7 +117,7 @@ async function addNagger(userId, nagger) {
             }
             let newId = result[0].nagger_last_id + 1;
             newNagger.naggerId = result[0].nagger_last_id + 1;
-
+            newNagger.nextExecution = nextExecution(newNagger.severity);
             naggerCollection.push(newNagger);
 
             con.query(`UPDATE users SET user_data = '${JSON.stringify(naggerCollection)}', nagger_last_id=${newNagger.naggerId} WHERE userId = ${userId}`, function (err, result) {
@@ -157,6 +159,7 @@ async function alterNagger(userId, naggerId, newNagger) {
             oldNagger.title = newNagger.title;
             oldNagger.description = newNagger.description;
             oldNagger.severity = newNagger.severity;
+            oldNagger.nextExecution = nextExecution(newNagger.severity);
             naggerCollection.push(oldNagger);
             con.query(`UPDATE users SET user_data = '${JSON.stringify(naggerCollection)}' WHERE userId = ${userId}`, function (err, result) {
                 if (err) throw err;
@@ -167,6 +170,24 @@ async function alterNagger(userId, naggerId, newNagger) {
     return await promise;
 }
 
+function updateNextExecutionTime(userId, naggerId) {
+    console.log("Updating next execution time");
+    return new Promise((resolve, reject) => {
+        con.query(`SELECT user_data FROM users WHERE userId = ${userId}`, function (err, result) {
+            if (err) throw err;
+            let naggerCollection = JSON.parse(result[0].user_data);
+            let nagger = naggerCollection.filter(nagger => nagger.naggerId == naggerId)[0];
+            nagger.nextExecution = nextExecution(nagger.severity);
+            naggerCollection = naggerCollection.filter(nagger => nagger.naggerId != naggerId);
+            naggerCollection.push(nagger);
+            con.query(`UPDATE users SET user_data = '${JSON.stringify(naggerCollection)}' WHERE userId = ${userId}`, function (err, result) {
+                if (err) throw err;
+                resolve('ok');
+            });
+        });
+    });
+}
+
 async function addDevice(userId, deviceId, deviceInfo, s) {
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT devices FROM users WHERE userId = ${userId}`, function (err, result) {
@@ -175,6 +196,7 @@ async function addDevice(userId, deviceId, deviceInfo, s) {
             
             if (result[0].devices) devices = JSON.parse(result[0].devices);
             let newDevice = {
+                enabled: true,
                 deviceId,
                 deviceInfo,
                 s
@@ -195,4 +217,14 @@ async function addDevice(userId, deviceId, deviceInfo, s) {
     return await promise;
 }
 
-module.exports = { addDevice, alterNagger, deleteNagger, addNagger, connectToDatabase, addUserToDatabase, extractUserPassword, checkEmailAvailability, checkUsernameAvailability, getUserNaggers };
+async function extractData() {
+    let promise = new Promise((resolve, reject) => {
+        con.query(`SELECT userId, user_data, devices FROM users`, function (err, result) {
+            if (err) throw err;
+            resolve(result);
+        });
+    });
+    return await promise;
+}
+
+module.exports = { updateNextExecutionTime,extractData, addDevice, alterNagger, deleteNagger, addNagger, connectToDatabase, addUserToDatabase, extractUserPassword, checkEmailAvailability, checkUsernameAvailability, getUserNaggers };
