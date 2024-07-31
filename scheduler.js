@@ -12,7 +12,7 @@ function nextExecution(interval){
        date.setHours(date.getHours() + 7);
     }
     else if(interval == 0){
-        date.setMinutes(date.getMinutes() + 10);
+        date.setSeconds(date.getSeconds() + 20);
     }
     else if(interval == 1){
         date.setMinutes(date.getMinutes() + 20);

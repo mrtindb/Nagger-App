@@ -22,16 +22,16 @@ async function addUserToDatabase(username, email, password) {
     var t = new Date(Date.now());
     let formattedDate = t.toISOString().split('T')[0];
 
-    let toInsert = [[username, email, password, formattedDate, JSON.stringify([]), 0]];
+    let toInsert = [username, email, password, formattedDate, JSON.stringify([]), 0];
 
-    const queryString = "INSERT INTO `users` (`username`, `email`, `password`, `acc_created_on`, `user_data`, `nagger_last_id`) VALUES (?)";
+    const queryString = "INSERT INTO `users` (`username`, `email`, `password`, `acc_created_on`, `user_data`, `nagger_last_id`) VALUES (?,?,?,?,?,?)";
 
 
     let promise = new Promise((resolve, reject) => {
         con.query(queryString, toInsert, function (err, result) {
             if (err) throw err;
         });
-        con.query(`SELECT userId FROM users WHERE username = '${username}'`, function (err, result) {
+        con.query(`SELECT userId FROM users WHERE username = ?`, [username] ,function (err, result) {
             if (err) throw err;
             resolve(result);
         });
@@ -43,7 +43,7 @@ async function extractUserPassword(username, email) {
 
     let promise = new Promise((resolve, reject) => {
 
-        con.query(`SELECT password, userId FROM users WHERE username = '${username}' OR email = '${email}'`, function (err, result) {
+        con.query(`SELECT password, userId FROM users WHERE username = ? OR email = ?`,[username,email] , function (err, result) {
             if (err) throw err;
             if (result.length === 0) {
                 resolve("error");
@@ -57,7 +57,7 @@ async function extractUserPassword(username, email) {
 
 async function checkUsernameAvailability(username) {
     let promise = new Promise((resolve, reject) => {
-        con.query(`SELECT username, email FROM users WHERE username = '${username}'`, function (err, result) {
+        con.query(`SELECT username, email FROM users WHERE username = ?`,[username], function (err, result) {
             if (err) throw err;
             if (result.length === 0) {
                 resolve(true);
@@ -73,7 +73,7 @@ async function checkUsernameAvailability(username) {
 async function checkEmailAvailability(email) {
     let promise = new Promise((resolve, reject) => {
 
-        con.query(`SELECT username, email FROM users WHERE email = '${email}'`, function (err, result) {
+        con.query(`SELECT username, email FROM users WHERE email = ?`,[email], function (err, result) {
             if (err) throw err;
             if (result.length === 0) {
                 resolve(true);
@@ -88,7 +88,7 @@ async function checkEmailAvailability(email) {
 
 async function getUserNaggers(userId) {
     let promise = new Promise((resolve, reject) => {
-        con.query(`SELECT user_data FROM users WHERE userId = ${userId}`, function (err, result) {
+        con.query(`SELECT user_data FROM users WHERE userId = ?`,[userId], function (err, result) {
             if (err) throw err;
             if (result.length === 0) { resolve([]); return; }
             resolve(JSON.parse(result[0].user_data));
@@ -104,7 +104,7 @@ async function addNagger(userId, nagger) {
 
         let naggerCollection = [];
 
-        con.query(`SELECT user_data,nagger_last_id FROM users WHERE userId = ${userId}`, function (err, result) {
+        con.query(`SELECT user_data,nagger_last_id FROM users WHERE userId = ?`,[userId] , function (err, result) {
 
             if (err) {
                 throw err;
@@ -120,7 +120,8 @@ async function addNagger(userId, nagger) {
             newNagger.nextExecution = nextExecution(newNagger.severity);
             naggerCollection.push(newNagger);
 
-            con.query(`UPDATE users SET user_data = '${JSON.stringify(naggerCollection)}', nagger_last_id=${newNagger.naggerId} WHERE userId = ${userId}`, function (err, result) {
+            con.query(`UPDATE users SET user_data = ?, nagger_last_id = ? WHERE userId = ?`,
+            [JSON.stringify(naggerCollection),newNagger.naggerId,userId] , function (err, result) {
                 if (err) throw err;
                 resolve(newId);
             });
@@ -132,13 +133,15 @@ async function addNagger(userId, nagger) {
 
 async function deleteNagger(userId, naggerId) {
     let promise = new Promise((resolve, reject) => {
-        con.query(`SELECT user_data FROM users WHERE userId = ${userId}`, function (err, result) {
+        con.query(`SELECT user_data FROM users WHERE userId = ?` , [userId], function (err, result) {
             if (err) throw err;
             let naggerCollection = JSON.parse(result[0].user_data);
 
             let newNaggerCollection = naggerCollection.filter(nagger => nagger.naggerId != naggerId);
 
-            con.query(`UPDATE users SET user_data = '${JSON.stringify(newNaggerCollection)}' WHERE userId = ${userId}`, function (err, result) {
+            con.query(`UPDATE users SET user_data = ? WHERE userId = ?`,
+            
+            [JSON.stringify(newNaggerCollection), userId ], function (err, result) {
                 if (err) throw err;
                 resolve('ok');
             });
@@ -150,7 +153,7 @@ async function deleteNagger(userId, naggerId) {
 async function alterNagger(userId, naggerId, newNagger) {
 
     let promise = new Promise((resolve, reject) => {
-        con.query(`SELECT user_data FROM users WHERE userId = ${userId}`, function (err, result) {
+        con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
             let naggerCollection = JSON.parse(result[0].user_data);
 
@@ -161,7 +164,8 @@ async function alterNagger(userId, naggerId, newNagger) {
             oldNagger.severity = newNagger.severity;
             oldNagger.nextExecution = nextExecution(newNagger.severity);
             naggerCollection.push(oldNagger);
-            con.query(`UPDATE users SET user_data = '${JSON.stringify(naggerCollection)}' WHERE userId = ${userId}`, function (err, result) {
+            con.query(`UPDATE users SET user_data = ? WHERE userId = ?`,
+            [JSON.stringify(naggerCollection),userId], function (err, result) {
                 if (err) throw err;
                 resolve('ok');
             });
@@ -173,14 +177,15 @@ async function alterNagger(userId, naggerId, newNagger) {
 function updateNextExecutionTime(userId, naggerId) {
     console.log("Updating next execution time");
     return new Promise((resolve, reject) => {
-        con.query(`SELECT user_data FROM users WHERE userId = ${userId}`, function (err, result) {
+        con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
             let naggerCollection = JSON.parse(result[0].user_data);
             let nagger = naggerCollection.filter(nagger => nagger.naggerId == naggerId)[0];
             nagger.nextExecution = nextExecution(nagger.severity);
             naggerCollection = naggerCollection.filter(nagger => nagger.naggerId != naggerId);
             naggerCollection.push(nagger);
-            con.query(`UPDATE users SET user_data = '${JSON.stringify(naggerCollection)}' WHERE userId = ${userId}`, function (err, result) {
+            con.query(`UPDATE users SET user_data = ? WHERE userId = ?`, 
+            [JSON.stringify(naggerCollection),userId], function (err, result) {
                 if (err) throw err;
                 resolve('ok');
             });
@@ -190,7 +195,7 @@ function updateNextExecutionTime(userId, naggerId) {
 
 async function addDevice(userId, deviceId, deviceInfo, s) {
     let promise = new Promise((resolve, reject) => {
-        con.query(`SELECT devices FROM users WHERE userId = ${userId}`, function (err, result) {
+        con.query(`SELECT devices FROM users WHERE userId = ?`, [userId], function (err, result) {
             let devices = new Array();
             if (err) throw err;
             
@@ -208,7 +213,8 @@ async function addDevice(userId, deviceId, deviceInfo, s) {
             devices.push(newDevice);
             console.log("=================================");
             console.log(devices);
-            con.query(`UPDATE users SET devices = '${JSON.stringify(devices)}' WHERE userId = ${userId}`, function (err, result) {
+            con.query(`UPDATE users SET devices = ? WHERE userId = ?`,
+            [JSON.stringify(devices),userId], function (err, result) {
                 if (err) throw err;
                 resolve('ok');
             });
@@ -227,4 +233,15 @@ async function extractData() {
     return await promise;
 }
 
-module.exports = { updateNextExecutionTime,extractData, addDevice, alterNagger, deleteNagger, addNagger, connectToDatabase, addUserToDatabase, extractUserPassword, checkEmailAvailability, checkUsernameAvailability, getUserNaggers };
+async function extractDevices(userId) {
+
+    let promise = new Promise((resolve, reject) => {
+        con.query(`SELECT devices FROM users WHERE userId = ?`, [userId], function (err, result) {
+            if (err) throw err;
+            resolve(result[0].devices);
+        });
+    });
+    return await promise;
+}
+
+module.exports = { extractDevices,updateNextExecutionTime,extractData, addDevice, alterNagger, deleteNagger, addNagger, connectToDatabase, addUserToDatabase, extractUserPassword, checkEmailAvailability, checkUsernameAvailability, getUserNaggers };

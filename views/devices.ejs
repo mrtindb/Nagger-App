@@ -1,4 +1,80 @@
-<!DOCTYPE html>
-<html>
-    <a href="/home">Home</a>
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+<%- include('partials/head'); %>
+
+    <body data-bs-theme="dark">
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+            integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+            crossorigin="anonymous"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+
+                let params = new URLSearchParams(window.location.search);
+                let theme = params.get('theme');
+                checkTheme(theme);
+
+            }, false);
+        </script>
+
+        <!-- top header-->
+        <%- include('partials/header'); %>
+            <!-- Main Container -->
+            <div class="container-fluid" style="min-height: 30em;">
+
+                <div class="row">
+
+                    <!-- Navbar/Navdrawer -->
+                    <%- include('partials/navdrawer'); %>
+                        <!-- Main Content -->
+                        <main class="col-md-9 col-lg-10 px-2 px-md-4 py-2 py-md-4">
+                            <div class="container">
+                                <h1 class="display-5 my-4">Devices associated with this account</h1>
+                                <table class="table table-tertiary table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Platform
+                                            </th>
+                                            <th>
+                                                Browser
+                                            </th>
+                                            <th>
+                                                Enabled:
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if(devices) for(var device of devices){ %>
+                                            <tr>
+                                                <td>
+                                                    <%= device.deviceInfo.platform %>
+                                                </td>
+                                                <td>
+                                                    <%= device.deviceInfo.browser %>
+                                                </td>
+                                                <td>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input bg-text-success" type="checkbox" role="switch"
+                                                            id="flexSwitchCheckDefault" value="enabled" <%
+                                                            if(device.enabled) {%> checked <% } %> >
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </main>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <%- include('partials/footer'); %>
+
+    </body>
+
 </html>
