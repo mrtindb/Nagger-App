@@ -1,5 +1,5 @@
 
-    function changeTheme(themeBool) {
+    function changeTheme() {
       var theme = document.getElementsByTagName('body')[0].getAttribute('data-bs-theme');
       if (theme == 'dark') {
         document.getElementsByTagName('body')[0].setAttribute('data-bs-theme', 'light');

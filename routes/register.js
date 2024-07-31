@@ -4,8 +4,9 @@
 const express = require('express');
 const routes = express.Router();
 const createJwt = require('../createjwt');
-const { addUserToDatabase, checkEmailAvailability, checkUsernameAvailability } = require('../database');
+const { addUserToDatabase, checkEmailAvailability, checkUsernameAvailability, addDevice } = require('../database');
 const { hashPassword } = require('../passwordhashing');
+const { v4: uuidv4 } = require('uuid');
 
 routes.get('/', async (req, res) => {
     res.render('register', {errorFlag: false, errorMessage: ""});
@@ -40,6 +41,7 @@ routes.post('/', async (req, res) => {
     const token = createJwt(user, username, email);
 
     res.cookie('jwt', token, {httpOnly: true, secure: true});
+    
     
     res.redirect('/home');
 });
