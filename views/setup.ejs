@@ -41,7 +41,10 @@
                                     <h1 class="display-5 my-2">Setting up the Application</h1>
                                     <p class="my-2">
                                         Before you can use all features of the Application, you need to complete a
-                                        one-time setup that varies depending on the platform that you are using.
+                                        one-time setup that varies depending on the platform that you are using. 
+                                        <span style="font-weight: bold;">
+                                            Upon success, your device must show up in the 'Devices' tab.
+                                        </span>
                                     </p>
                                 </div>
                                 <div class="row">
@@ -118,6 +121,24 @@
                                 <div style="margin:auto; display:flex; justify-content: center;" class="mt-4">
                                 <button class="btn btn-success my-4 mx-auto" id="enableNotificationsButton">Enable Notifications</button>
                                 </div>
+                                <div class="alert alert-success d-none" id="success-alert">
+                                    <h4 class="alert-heading">
+                                        Success!
+                                    </h4>
+                                    <p>
+                                        The Nagger app is ready to use!
+                                    </p>
+                                </div>
+                               <% if(set===true) { %>
+                                <div class="alert alert-success" id="success-alert">
+                                    <h4 class="alert-heading">
+                                        All done!
+                                    </h4>
+                                    <p>
+                                        The Nagger app is already configured.
+                                    </p>
+                                </div>
+                               <% } %>
                             </div>
                         </main>
                 </div>

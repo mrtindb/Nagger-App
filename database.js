@@ -3,7 +3,7 @@
 const mysql = require('mysql2');
 const nextExecution = require('./scheduler');
 var con = mysql.createConnection({
-    host: process.env.DB_LOCALHOST,
+    host: process.env.DB_HOST,
     user: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
 });
@@ -12,19 +12,19 @@ function connectToDatabase() {
     con.connect(function (err) {
         if (err) throw err;
     })
-    con.query("USE nagger", function (err, result) {
+    con.query("USE dbnagger", function (err, result) {
         if (err) throw err;
     })
 }
 
-async function addUserToDatabase(username, email, password) {
+async function addUserToDatabase(username, email, password, notificationIdentifier) {
 
     var t = new Date(Date.now());
     let formattedDate = t.toISOString().split('T')[0];
 
-    let toInsert = [username, email, password, formattedDate, JSON.stringify([]), 0];
+    let toInsert = [username, email, password, formattedDate, JSON.stringify([]), 0, notificationIdentifier];
 
-    const queryString = "INSERT INTO `users` (`username`, `email`, `password`, `acc_created_on`, `user_data`, `nagger_last_id`) VALUES (?,?,?,?,?,?)";
+    const queryString = "INSERT INTO `users` (`username`, `email`, `password`, `acc_created_on`, `user_data`, `nagger_last_id`, `notification_identifier`) VALUES (?,?,?,?,?,?,?)";
 
 
     let promise = new Promise((resolve, reject) => {

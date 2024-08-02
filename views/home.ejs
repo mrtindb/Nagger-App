@@ -345,13 +345,14 @@
             <!-- Main Content -->
             <main class="col-md-9 col-lg-10 px-2 px-md-4 py-2 py-md-4">
               <div class="container-fluid px-0 text-center">
-
-                <div class="alert alert-warning align-items-start justify-content-start d-none" id="setupAlert" role="alert">
-
+                <% if(set!=true) { %>
+                <div class="alert alert-warning align-items-start justify-content-start" id="setupAlert" role="alert">
                   <div>
                     <i class="bi bi-exclamation-triangle"></i> You need to <a href="setup">setup</a> the app before you can use its features.
                   </div>
                 </div>
+                <% } %>
+
                 <div id="row" class="row g-2 row-cols-2 text-md-center row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5">
 
 

@@ -5,20 +5,35 @@ const express = require('express');
 const routes = express.Router();
 const webpush = require('web-push');
 const jwtMiddleware = require('../jwtMiddleware');
-const { getUserNaggers, addNagger, deleteNagger, alterNagger, addDevice } = require('../database');
+const { getUserNaggers, addNagger, deleteNagger, alterNagger, addDevice, extractDevices } = require('../database');
 const { escapeUserInput } = require('../escaping');
 const { v4: uuidv4 } = require('uuid');
 
 routes.get('/', jwtMiddleware, async (req, res) => {
 
     const userData = req.user;
+    let set = req.cookies.set;
     const naggers = await getUserNaggers(userData.userId);
-    console.log(naggers);
+    let deviceID = req.cookies.deviceID || "";
+    let devices = JSON.parse(await extractDevices(userData.userId)) || [];
+    console.log(devices);
+    console.log(deviceID);
+    let x = devices.filter(device => device.deviceId === deviceID);
+    console.log(x);
+    if (x.length == 0) {
+        console.log('set:');
+        set = false;
+    }
+    console.log('set:');
+    
+    set = set=="true"?true:false;
+    console.log(set);
+    //console.log(naggers);
     if (naggers.length === 0) {
-        res.render('home', { naggers: false });
+        res.render('home', { naggers: false, set });
     }
     else {
-        res.render('home', { naggers });
+        res.render('home', { naggers, set });
     }
 });
 
@@ -96,7 +111,7 @@ var s;
 routes.post('/subscribe', jwtMiddleware,  async (req, res) => {
 
     s = req.body;
-    console.log(s);
+    //console.log(s);
     let deviceID = req.cookies.deviceID;
     if (!deviceID) {
 
@@ -106,9 +121,8 @@ routes.post('/subscribe', jwtMiddleware,  async (req, res) => {
     const expiryDate = new Date(2037, 0, 1);
     await addDevice(req.user.userId, deviceID, req.useragent, s);
     res.cookie('deviceID', deviceID, { httpOnly: true, secure: true, expires: expiryDate });
-
-
-    res.status(201).json({});
+    res.cookie('set', true, {secure: true, expires: expiryDate});
+    res.status(201).json({status:'ok'});
     return;
 });
 

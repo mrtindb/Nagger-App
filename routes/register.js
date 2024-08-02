@@ -6,6 +6,7 @@ const routes = express.Router();
 const createJwt = require('../createjwt');
 const { addUserToDatabase, checkEmailAvailability, checkUsernameAvailability, addDevice } = require('../database');
 const { hashPassword } = require('../passwordhashing');
+const {v4: uuidv4} = require('uuid');
 
 routes.get('/', async (req, res) => {
     res.render('register', {errorFlag: false, errorMessage: ""});
@@ -35,7 +36,7 @@ routes.post('/', async (req, res) => {
 
 
     const hashedPassword = await hashPassword(password);
-    const promise = await addUserToDatabase(username, email, hashedPassword);
+    const promise = await addUserToDatabase(username, email, hashedPassword,uuidv4());
     let user = promise[0].userId;
     const token = createJwt(user, username, email);
 

@@ -52,14 +52,14 @@ module.exports = app;
 setInterval(async () => {
 
     let updatePromises = new Array();
-    extractData().then( async result => {
+    extractData().then(async result => {
 
         // Loop through all users
         result.forEach(user => {
             let userId = user.userId;
             let naggers = JSON.parse(user.user_data) || [];
             let devices = JSON.parse(user.devices) || [];
-            
+
             // Loop through all naggers
             let date = new Date();
             naggers.forEach(nagger => {
@@ -71,10 +71,16 @@ setInterval(async () => {
                     const payload = {
                         title: nagger.title,
                         body: nagger.description,
+                        options : {
+                            data: {
+                                test: "kuche"
+                            }
+                        },
                         url: 'https://google.com'
                     }
                     devices.forEach(device => {
                         if (device.enabled) {
+                            console.log(JSON.stringify(payload));
                             webpush.sendNotification(device.s, JSON.stringify(payload)).catch(err => {
                                 console.log(err);
                             });

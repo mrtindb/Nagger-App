@@ -25,8 +25,8 @@ export function registerServiceWorker() {
     else alert('Notifications are not supported in this browser. Please use a different browser.');
   };
 
-  function sendSubscriptionToServer(subscription) {
-    return fetch('/subscribe', {
+  async function sendSubscriptionToServer(subscription) {
+    return await fetch('/subscribe', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -41,9 +41,17 @@ export function registerServiceWorker() {
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array('BDc4tPwlYDOyk7AWjeVOWnnlHMh0_IieE7uMb0g-ertvHKhf-sFKgR5_enTsTU5Pzpxq2rreqkka3T0-MsY5Q5Y')
       });
-    }).then(function (subscription) {
-
-      sendSubscriptionToServer(subscription);
+    }).then(async function (subscription) {
+      let alert = document.getElementById('success-alert');
+      let response = await sendSubscriptionToServer(subscription);
+      console.log(response);
+      if(response.status===201) {
+        alert.classList.remove('d-none');
+        
+        setTimeout(() => {
+          alert.classList.add('d-none');
+        }, 3000);
+      }
     }).catch(function (error) {
       console.error('Failed to subscribe the user: ', error);
     });
