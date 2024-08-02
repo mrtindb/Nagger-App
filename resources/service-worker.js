@@ -21,6 +21,10 @@ data:
 
 
 self.addEventListener('notificationclick', function(event) {
+    console.log(event);
+    console.log(event.notification);
+    console.log(event.data);
+    console.log(event.notification.data);
     const data = event.data.json();
-    event.waitUntil(clients.openWindow("https://nagnag.me/"+data.data.test));
+    event.waitUntil(clients.openWindow("https://someurl"+data.data.test));
 });
