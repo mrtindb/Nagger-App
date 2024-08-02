@@ -71,12 +71,9 @@ setInterval(async () => {
                     const payload = {
                         title: nagger.title,
                         body: nagger.description,
-                        options : {
-                            data: {
-                                test: "kuche"
-                            }
-                        },
-                        url: 'https://google.com'
+                        data:{
+                            test: 'test'
+                        }
                     }
                     devices.forEach(device => {
                         if (device.enabled) {
