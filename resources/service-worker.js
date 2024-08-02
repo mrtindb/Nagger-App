@@ -29,5 +29,5 @@ self.addEventListener('notificationclick', function(event) {
     console.log(event.data);
     console.log(event.notification.data);
     const data = event.notification.data.json();
-    event.waitUntil(clients.openWindow("https://someurl"+data.data.test));
+    event.waitUntil(clients.openWindow("https://someurl"+event.data.test));
 });
