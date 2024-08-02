@@ -5,7 +5,7 @@ self.addEventListener('push', function(event) {
     // fields: title, body, url
     const data = event.data.json();
     console.log(data);
-    const options = {body: data.body, test: 'test'};
+    const options = {body: data.body, data: {test: 'test field'}};
 
     event.waitUntil(self.registration.showNotification(data.title, options));
 
