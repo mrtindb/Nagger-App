@@ -1,4 +1,4 @@
-const { test } = require("media-typer");
+
 
 self.addEventListener('push', function(event) {
     //This extracts the payload data from the push event. The data is assumed to be in JSON format.
