@@ -16,18 +16,16 @@ routes.get('/', jwtMiddleware, async (req, res) => {
     const naggers = await getUserNaggers(userData.userId);
     let deviceID = req.cookies.deviceID || "";
     let devices = JSON.parse(await extractDevices(userData.userId)) || [];
-    console.log(devices);
-    console.log(deviceID);
     let x = devices.filter(device => device.deviceId === deviceID);
-    console.log(x);
+
     if (x.length == 0) {
-        console.log('set:');
+
         set = false;
     }
-    console.log('set:');
+
     
     set = set=="true"?true:false;
-    console.log(set);
+
     //console.log(naggers);
     if (naggers.length === 0) {
         res.render('home', { naggers: false, set });

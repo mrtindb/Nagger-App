@@ -80,9 +80,9 @@ setInterval(async () => {
                     }
                     devices.forEach(device => {
                         if (device.enabled) {
-                            console.log(JSON.stringify(payload));
+                            
                             webpush.sendNotification(device.s, JSON.stringify(payload)).catch(err => {
-                                console.log(err);
+                                
                             });
                         }
                     });

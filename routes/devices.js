@@ -8,7 +8,6 @@ const {extractDevices} = require('../database');
 routes.get('/', jwtMiddleware, async (req, res) => {
     let userId = req.user.userId;
     let devices = JSON.parse(await extractDevices(userId));
-    console.log(devices);
     res.render('devices', {devices});
 });
 

@@ -175,7 +175,6 @@ async function alterNagger(userId, naggerId, newNagger) {
 }
 
 function updateNextExecutionTime(userId, naggerId) {
-    console.log("Updating next execution time");
     return new Promise((resolve, reject) => {
         con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
@@ -211,8 +210,7 @@ async function addDevice(userId, deviceId, deviceInfo, s) {
                 return;
             }
             devices.push(newDevice);
-            console.log("=================================");
-            console.log(devices);
+
             con.query(`UPDATE users SET devices = ? WHERE userId = ?`,
             [JSON.stringify(devices),userId], function (err, result) {
                 if (err) throw err;

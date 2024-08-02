@@ -2,10 +2,9 @@
 
 function nextExecution(interval){
     let date = new Date();
-    console.log(date);
-    console.log(interval);
+
     if(isNaN(interval)){
-        console.log("Invalid interval"+ interval);
+
         return 0;
     }
     if(interval == 5){
@@ -26,7 +25,7 @@ function nextExecution(interval){
     else if(interval == 4){
         date.setHours(date.getHours() + 4);
     }
-    console.log(date);
+    
     return date;
 } 
 
