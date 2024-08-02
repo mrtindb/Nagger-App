@@ -71,7 +71,7 @@ setInterval(async () => {
                     const payload = {
                         title: nagger.title,
                         body: nagger.description,
-                        data:{
+                        details:{
                             test: 'test'
                         }
                     }
