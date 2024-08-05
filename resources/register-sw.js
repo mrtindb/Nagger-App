@@ -9,7 +9,7 @@ export function registerServiceWorker() {
               subscribeUserToPushNotifications();
 
             }).catch(function (error) {
-              //alert(error);
+              alert(error);
             });
           }
           else {
@@ -27,7 +27,7 @@ export function registerServiceWorker() {
 
   async function sendSubscriptionToServer(subscription) {
     return await fetch('/subscribe', {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },

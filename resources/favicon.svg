@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <color-profile
+       name="sRGB-IEC61966-2.1"
+       xlink:href="file:///C:/Windows/system32/spool/drivers/color/sRGB%20Color%20Space%20Profile.icm"
+       id="color-profile1" />
+  </defs>
+  <g
+     id="layer2">
+    <rect
+       style="fill:#212529;fill-opacity:1;stroke-width:0.258597"
+       id="rect17"
+       width="99.952126"
+       height="99.905357"
+       x="-7.4889241e-11"
+       y="3.8001846e-09" />
+  </g>
+  <g
+     id="layer1"
+     style="display:inline">
+    <path
+       style="fill:#ffffff;stroke-width:0.282839"
+       d="m 25.002805,19.999879 h 14.997772 l -0.0041,60.000972 -14.99777,0 z"
+       id="path14" />
+    <path
+       style="fill:#ffffff;stroke-width:0.28286"
+       d="m 75.000268,19.997271 -15.00363,0.0018 0.0043,60.003919 15.003508,-1.72e-4 z"
+       id="path15" />
+    <path
+       style="fill:#198452;fill-opacity:1;stroke-width:0.264583"
+       d="m 25.001143,19.997046 15.000427,9.67e-4 35.003416,60.005833 -15.006124,7.72e-4 z"
+       id="path17" />
+  </g>
+</svg>

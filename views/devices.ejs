@@ -11,7 +11,22 @@
             crossorigin="anonymous"></script>
 
             <script>setTheme()</script>
-
+            <script>
+                async function changeDeviceState(arg) {
+                    let id = arg.getAttribute('data-devid');
+                    fetch('/devices/changeState', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type':'application/json'
+                        },
+                        body: JSON.stringify({
+                            state: arg.checked,
+                            deviceId: id
+                        })
+                    }).then().catch(err => console.log(err));
+                    
+                }
+            </script>
         <!-- top header-->
         <%- include('partials/header'); %>
             <!-- Main Container -->
@@ -50,9 +65,9 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-check form-switch">
-                                                        <input class="form-check-input bg-text-success" type="checkbox" role="switch"
+                                                        <input  data-devid="<%= device.deviceId %>" class="form-check-input bg-text-success" type="checkbox" role="switch"
                                                             id="flexSwitchCheckDefault" value="enabled" <%
-                                                            if(device.enabled) {%> checked <% } %> >
+                                                            if(device.enabled) {%> checked <% } %> onchange="changeDeviceState(this)" >
                                                     </div>
                                                 </td>
                                             </tr>

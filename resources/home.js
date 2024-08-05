@@ -82,7 +82,7 @@ function addNewNagger() {
         naggerDate: formattedDate
     };
     fetch('/addNagger', {
-        method: 'PUT',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -161,7 +161,7 @@ function alterNagger() {
 
 
     fetch(`/alterNagger/${currentNaggerId}`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },

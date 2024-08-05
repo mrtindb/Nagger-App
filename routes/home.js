@@ -3,7 +3,6 @@
 
 const express = require('express');
 const routes = express.Router();
-const webpush = require('web-push');
 const jwtMiddleware = require('../jwtMiddleware');
 const { getUserNaggers, addNagger, deleteNagger, alterNagger, addDevice, extractDevices } = require('../database');
 const { escapeUserInput } = require('../escaping');
@@ -41,7 +40,7 @@ routes.get('/',
     }
 });
 //Validation done
-routes.put('/addNagger',
+routes.post('/addNagger',
 
      cookie('jwt').notEmpty().bail().isString().escape(), 
      jwtMiddleware, 
@@ -100,7 +99,7 @@ routes.delete('/deleteNagger/:id',
     }
 });
 
-routes.post('/alterNagger/:id',cookie('jwt').notEmpty().bail().isString().escape(),  jwtMiddleware, async (req, res) => {
+routes.put('/alterNagger/:id',cookie('jwt').notEmpty().bail().isString().escape(),  jwtMiddleware, async (req, res) => {
     if (!req.params.id) {
         res.status(400).send('Bad Request');
         return;
@@ -131,10 +130,9 @@ routes.post('/alterNagger/:id',cookie('jwt').notEmpty().bail().isString().escape
     }
 });
 
-var s;
-routes.post('/subscribe', cookie('jwt').notEmpty().bail().isString().escape(), jwtMiddleware,  async (req, res) => {
+routes.put('/subscribe', cookie('jwt').notEmpty().bail().isString().escape(), jwtMiddleware,  async (req, res) => {
 
-    s = req.body;
+    let s = req.body;
     //console.log(s);
     let deviceID = req.cookies.deviceID;
     if (!deviceID) {
@@ -148,20 +146,6 @@ routes.post('/subscribe', cookie('jwt').notEmpty().bail().isString().escape(), j
     res.cookie('set', true, {secure: true, expires: expiryDate});
     res.status(201).json({status:'ok'});
     return;
-});
-
-routes.post('/sendNotification', cookie('jwt').notEmpty().bail().isString().escape(),  jwtMiddleware , (req, res) => {
-    const userAgent = req.useragent;
-    const notificationPayload = {
-        title: userAgent.browser + ' ' + userAgent.platform,
-        body: 'This is the body of the notification',
-        url: 'https://google.com',
-    };
-
-
-    webpush.sendNotification(s, JSON.stringify(notificationPayload));
-    res.status(201).json({});
-
 });
 
 

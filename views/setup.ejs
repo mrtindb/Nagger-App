@@ -12,6 +12,10 @@
             crossorigin="anonymous"></script>
 
             <script>setTheme()</script>
+            <script type="module">
+                import { registerServiceWorker } from '/register-sw.js';
+                document.getElementById('enableNotificationsButton').addEventListener('click', registerServiceWorker);
+            </script>
         <%- include('partials/header') %>
 
             <div class="container-fluid" style="min-height: 40em;">
