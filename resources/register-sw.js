@@ -3,22 +3,22 @@ export function registerServiceWorker() {
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
 
-          if ('serviceWorker' in navigator && 'PushManager' in window) {
+          if ('PushManager' in window) {
             navigator.serviceWorker.register('/service-worker.js').then(function (registration) {
 
               subscribeUserToPushNotifications();
 
             }).catch(function (error) {
-              alert(error);
+              //alert(error);
             });
           }
           else {
-            alert('Service Worker and PushManager are not supported in this browser. Please use a different browser.');
+            alert('PushManager is not supported in this browser.');
           }
 
         } else {
-          // Permissions denied, notify user
-          alert('Notifications are disabled. Please enable them in your browser settings.' + permission);
+          // Permissions denied
+          alert('Notifications are disabled. Please enable them in your browser settings.');
         }
       });
     }
@@ -44,10 +44,11 @@ export function registerServiceWorker() {
     }).then(async function (subscription) {
       let alert = document.getElementById('success-alert');
       let response = await sendSubscriptionToServer(subscription);
-      console.log(response);
+      
       if(response.status===201) {
         alert.classList.remove('d-none');
-        
+        let button = document.getElementById('enableNotificationsButton');
+        button.setAttribute('disabled', 'true');
         setTimeout(() => {
           alert.classList.add('d-none');
         }, 3000);
@@ -59,9 +60,7 @@ export function registerServiceWorker() {
 
   function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-      .replace(/\-/g, '+')
-      .replace(/_/g, '/');
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
 
     const rawData = window.atob(base64);
     const outputArray = new Uint8Array(rawData.length);
@@ -69,5 +68,6 @@ export function registerServiceWorker() {
     for (let i = 0; i < rawData.length; ++i) {
       outputArray[i] = rawData.charCodeAt(i);
     }
+    console.log(outputArray);
     return outputArray;
   }

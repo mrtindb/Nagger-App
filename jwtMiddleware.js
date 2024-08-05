@@ -1,8 +1,16 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const { matchedData, validationResult } = require('express-validator');
 
 function jwtMiddleware(req, res, next) {
-    const token = req.cookies.jwt;
+    const result = validationResult(req);
+
+    if(!result.isEmpty()) {
+        return res.redirect('/login');
+    }
+
+    const token = matchedData(req).jwt;
+
     if(!token) {
         return res.redirect('/login');
     }

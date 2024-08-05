@@ -1,30 +1,34 @@
+var theme = undefined;
+var params = new URLSearchParams(window.location.search);
+function setTheme() {
 
-    function changeTheme() {
-      var theme = document.getElementsByTagName('body')[0].getAttribute('data-bs-theme');
-      if (theme == 'dark') {
-        document.getElementsByTagName('body')[0].setAttribute('data-bs-theme', 'light');
-        themeBool = true;
+  theme = params.get('theme');
+  if (!theme) theme = 'light';
+  if(theme==='light') theme='light';
+  else theme = 'dark';
+  document.body.setAttribute('data-bs-theme', theme);
+  params.set('theme', theme); 
+  let newURL = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + params.toString();
+  window.history.pushState({ path: newURL }, '', newURL);
+  document.addEventListener("DOMContentLoaded", () => updateLinks());
+}
 
-        let params = {
-          theme: "light"
-        };
-        let searchParams = new URLSearchParams(params);
-        let newURL = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + searchParams.toString();
-        window.history.pushState({ path: newURL }, '', newURL);
+function changeTheme() {
+  if (theme === 'light') theme = 'dark';
+  else theme = 'light';
+  document.body.setAttribute('data-bs-theme', theme);
+  params.set('theme', theme); 
+  let newURL = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + params.toString();
+  window.history.pushState({ path: newURL }, '', newURL);
+  updateLinks();
+}
 
-      } else {
-        document.getElementsByTagName('body')[0].setAttribute('data-bs-theme', 'dark');
-        themeBool = false;
-
-        let params = {
-          theme: "dark"
-        };
-        let searchParams = new URLSearchParams(params);
-        let newURL = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + searchParams.toString();
-        window.history.pushState({ path: newURL }, '', newURL);
-      }
-    }
-    function checkTheme(themeArg) {
-      var theme = document.getElementsByTagName('body')[0].getAttribute('data-bs-theme');
-      if(themeArg!=theme) changeTheme();
-    }
+function updateLinks() {
+  if (theme === 'light') theme = 'light';
+  else theme = 'dark';
+  document.getElementById('home-link').setAttribute('href', `/home?theme=${theme}`);
+  document.getElementById('account-link').setAttribute('href', `/account?theme=${theme}`);
+  document.getElementById('setup-link').setAttribute('href', `/setup?theme=${theme}`);
+  document.getElementById('devices-link').setAttribute('href', `/devices?theme=${theme}`);
+  document.getElementById('about-link').setAttribute('href', `/about?theme=${theme}`);
+}

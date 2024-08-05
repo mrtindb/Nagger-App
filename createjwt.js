@@ -7,7 +7,7 @@ function createJwt(userId, username, email) {
         username,
         email
     };
-    const token = jwt.sign(payload, process.env.JWT_SECRET,{algorithm: 'HS256', expiresIn: '1h'});
+    const token = jwt.sign(payload, process.env.JWT_SECRET,{algorithm: 'HS256', expiresIn: '24d'});
     return token;
 }
 

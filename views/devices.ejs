@@ -10,15 +10,7 @@
             integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
             crossorigin="anonymous"></script>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-
-                let params = new URLSearchParams(window.location.search);
-                let theme = params.get('theme');
-                checkTheme(theme);
-
-            }, false);
-        </script>
+            <script>setTheme()</script>
 
         <!-- top header-->
         <%- include('partials/header'); %>

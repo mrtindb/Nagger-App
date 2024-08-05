@@ -4,9 +4,9 @@
 const express = require('express');
 const routes = express.Router();
 const jwtMiddleware = require('../jwtMiddleware');
-
-routes.get('/', jwtMiddleware ,async (req, res) => {
+const { cookie } = require('express-validator');
+routes.get('/',cookie('jwt').notEmpty().bail().isString().escape() , jwtMiddleware ,async (req, res) => {
     
-    res.render('account');
+    res.render('home');
 });
 module.exports = routes;
