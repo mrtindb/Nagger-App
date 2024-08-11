@@ -14,15 +14,16 @@ routes.get('/favicon.svg', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/favicon.svg'));  // Adjust the path based on your project structure
 });
 
+
+//Getting the page to reset the password
 routes.get('/', async (req, res) => {
     res.render('passreset');
 });
 
-//Creating the URL Token and sending Email
+//Creating the URL Token and sending Email (sent from the form in the passreset page)
 routes.post('/', async (req, res) => {
     const address = req.body.address;
     let userExists = await checkEmailAvailability(address);
-    console.log(userExists);
     if (userExists) {
         res.sendStatus(204);
         return;
@@ -33,12 +34,13 @@ routes.post('/', async (req, res) => {
     res.sendStatus(200);
 })
 
-//Opening the page to set the new password
+//Opening the page to set the new password (sent from the email)
 routes.get('/:to', async (req, res) => {
     const token = req.params.to;
     console.log(token);
     if(token.length===0) {res.redirect('/passreset'); return;}
     let email = await existsToken(token);
+    console.log(email);
     if (email === false) {
         res.render('invalid-token');
         return;
@@ -49,7 +51,7 @@ routes.get('/:to', async (req, res) => {
 });
 
 
-//Sending the new password
+//Sending the new password (sent from the form in the new-password page)
 routes.post('/set', async (req, res) => {
     let token = req.cookies.token;
     res.clearCookie('token');

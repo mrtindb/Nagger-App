@@ -271,7 +271,6 @@ async function storeURLToken(email, token) {
 
 async function existsToken(token){
     let promise = new Promise((resolve,reject)=>{
-        console.log("token: "+token);
         con.query("SELECT email,valid FROM reset_tokens WHERE token = ?", [token], (err,result) => {
             console.log("result: "  + result);
             
@@ -293,7 +292,7 @@ async function existsToken(token){
 
 async function changePassword(email,password){
     let promise = new Promise((resolve,reject) => {
-        con.query("UPDATE TABLE users SET password = ? WHERE email = ?", [password,email], (err,result)=>{
+        con.query("UPDATE users SET password = ? WHERE email = ?", [password,email], (err,result)=>{
             if(err) throw err;
             resolve('ok');
         })
