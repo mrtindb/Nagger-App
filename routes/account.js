@@ -7,6 +7,7 @@ const jwtMiddleware = require('../jwtMiddleware');
 const { cookie } = require('express-validator');
 routes.get('/',cookie('jwt').notEmpty().bail().isString().escape() , jwtMiddleware ,async (req, res) => {
     
-    res.render('home');
+    res.render('account');
+
 });
 module.exports = routes;

@@ -2,6 +2,7 @@
 
 const mysql = require('mysql2');
 const nextExecution = require('./scheduler');
+const { validate } = require('uuid');
 var con = mysql.createConnection({
     host: process.env.DB_LOCALHOST,
     user: process.env.DB_USERNAME,
@@ -40,9 +41,7 @@ async function addUserToDatabase(username, email, password, notificationIdentifi
 }
 
 async function extractUserPassword(username, email) {
-
     let promise = new Promise((resolve, reject) => {
-
         con.query(`SELECT password, userId FROM users WHERE username = ? OR email = ?`, [username, email], function (err, result) {
             if (err) throw err;
             if (result.length === 0) {
@@ -101,9 +100,7 @@ async function getUserNaggers(userId) {
 async function addNagger(userId, nagger) {
     let newNagger = nagger;
     let promise = new Promise((resolve, reject) => {
-
         let naggerCollection = [];
-
         con.query(`SELECT user_data,nagger_last_id FROM users WHERE userId = ?`, [userId], function (err, result) {
 
             if (err) {
@@ -115,6 +112,7 @@ async function addNagger(userId, nagger) {
             else {
                 naggerCollection = JSON.parse(result[0].user_data);
             }
+
             let newId = result[0].nagger_last_id + 1;
             newNagger.naggerId = result[0].nagger_last_id + 1;
             newNagger.nextExecution = nextExecution(newNagger.severity);
@@ -128,7 +126,6 @@ async function addNagger(userId, nagger) {
         });
     });
     return await promise;
-
 }
 
 async function deleteNagger(userId, naggerId) {
@@ -136,13 +133,11 @@ async function deleteNagger(userId, naggerId) {
         con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
             let naggerCollection = JSON.parse(result[0].user_data);
-
             let newNaggerCollection = naggerCollection.filter(nagger => nagger.naggerId != naggerId);
-
             con.query(`UPDATE users SET user_data = ? WHERE userId = ?`,
-
                 [JSON.stringify(newNaggerCollection), userId], function (err, result) {
                     if (err) throw err;
+                    console.log('resolve');
                     resolve('ok');
                 });
         });
@@ -151,7 +146,6 @@ async function deleteNagger(userId, naggerId) {
 }
 
 async function alterNagger(userId, naggerId, newNagger) {
-
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
@@ -207,7 +201,6 @@ async function addDevice(userId, deviceId, deviceInfo, s) {
                 return;
             }
             devices.push(newDevice);
-
             con.query(`UPDATE users SET devices = ? WHERE userId = ?`,
                 [JSON.stringify(devices), userId], function (err, result) {
                     if (err) throw err;
@@ -229,7 +222,6 @@ async function extractData() {
 }
 
 async function extractDevices(userId) {
-
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT devices FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
@@ -246,11 +238,66 @@ async function changeDeviceState(userId, deviceId, state) {
         devices[targetDeviceIndex].enabled = state;
         con.query(`UPDATE users SET devices = ? WHERE userId = ?`, [JSON.stringify(devices), userId], (err, result) => {
             if (err) throw err;
+            resolve('ok');
         })
-        resolve('ok');
+
     }
     )
     return await promise;
 }
 
-module.exports = { changeDeviceState, extractDevices, updateNextExecutionTime, extractData, addDevice, alterNagger, deleteNagger, addNagger, connectToDatabase, addUserToDatabase, extractUserPassword, checkEmailAvailability, checkUsernameAvailability, getUserNaggers };
+async function storeURLToken(email, token) {
+    let date = new Date(Date.now());
+    date.setMinutes = date.getMinutes + 15;
+    let promise = new Promise(async (resolve, reject) => {
+        con.query('SELECT * FROM reset_tokens WHERE email=?', [email], (err, result) => {
+            if (result.length !== 0) {
+                con.query('UPDATE reset_tokens SET token=?,valid=? WHERE email=?', [token, JSON.stringify({validUntil:date}), email], (err, result) => {
+                    if (err) throw err;
+                    resolve('ok');
+                })
+            }
+            else {
+                con.query('INSERT INTO reset_tokens VALUES (?,?,?)', [email, token, JSON.stringify({validUntil:date})], (err, result) => {
+                    if (err) throw err;
+                    resolve('ok');
+                })
+            }
+        })
+
+
+    })
+}
+
+async function existsToken(token){
+    let promise = new Promise((resolve,reject)=>{
+        console.log("token: "+token);
+        con.query("SELECT email,valid FROM reset_tokens WHERE token = ?", [token], (err,result) => {
+            console.log("result: "  + result);
+            
+            if(err) throw err;
+            if(result.length==0) {
+                resolve (false);
+                return;
+            }
+            console.log("result[0]: "  + result[0]);
+            let date = new Date(Date.now());
+            if(JSON.parse(result[0].valid).validUntil<date) {
+                resolve(false);
+            }
+            else resolve(result[0].email);
+        })
+    })
+    return await promise;
+}
+
+async function changePassword(email,password){
+    let promise = new Promise((resolve,reject) => {
+        con.query("UPDATE TABLE users SET password = ? WHERE email = ?", [password,email], (err,result)=>{
+            if(err) throw err;
+            resolve('ok');
+        })
+    })
+    return await promise;
+}
+module.exports = { changePassword,existsToken,storeURLToken, changeDeviceState, extractDevices, updateNextExecutionTime, extractData, addDevice, alterNagger, deleteNagger, addNagger, connectToDatabase, addUserToDatabase, extractUserPassword, checkEmailAvailability, checkUsernameAvailability, getUserNaggers };

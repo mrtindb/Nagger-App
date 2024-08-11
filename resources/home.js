@@ -140,7 +140,7 @@ function deleteNagger() {
             'Content-Type': 'application/json'
         }
     }).then(response => {
-        if (response.ok) {
+        if (response.status===204) {
             let card = document.querySelector(`[data-bs-naggerId="${currentNaggerId}"]`);
             card.remove();
         }

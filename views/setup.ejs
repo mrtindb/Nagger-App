@@ -13,7 +13,7 @@
 
             <script>setTheme()</script>
             <script type="module">
-                import { registerServiceWorker } from '/register-sw.js';
+                import { registerServiceWorker } from 'static/register-sw.js';
                 document.getElementById('enableNotificationsButton').addEventListener('click', registerServiceWorker);
             </script>
         <%- include('partials/header') %>
