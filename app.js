@@ -26,7 +26,11 @@ webpush.setVapidDetails(
     process.env.PRIVATE_VAPID_KEY
 );
 //Static files 
+app.get('/register-sw.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'resources', 'register-sw.js'));
+});
 app.use('/static',express.static(path.join(__dirname, 'resources')));
+
 
 
 //Removing trailing slashes
@@ -58,6 +62,7 @@ app.use('/register', register);
 app.use('/login', login);
 app.use('/logout', logout);
 app.use('/passreset', passreset);
+app.use('/passreset/static', express.static(path.join(__dirname, 'resources')));
 //app.use('/account', account);
 app.get('/about', (req, res) => { res.render('about') });
 app.use('/setup', require('./routes/setup'));

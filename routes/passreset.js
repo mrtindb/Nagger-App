@@ -2,18 +2,20 @@
 
 const express = require('express');
 const routes = express.Router();
-const { checkEmailAvailability, storeURLToken, existsToken, changePassword } = require('../database');
+const { checkEmailAvailability, storeURLToken, existsToken, changePassword, invalidateURLToken } = require('../database');
 const sendMail = require('../mail');
 const crypto = require('crypto');
 const path = require('path');
 const { hashPassword } = require('../passwordhashing');
 
 
+//Static files
+/*
 routes.get('/favicon.svg', (req, res) => {
     console.log('dogs');
     res.sendFile(path.join(__dirname, 'public/favicon.svg'));  // Adjust the path based on your project structure
 });
-
+*/
 
 //Getting the page to reset the password
 routes.get('/', async (req, res) => {
@@ -37,10 +39,8 @@ routes.post('/', async (req, res) => {
 //Opening the page to set the new password (sent from the email)
 routes.get('/:to', async (req, res) => {
     const token = req.params.to;
-    console.log(token);
     if(token.length===0) {res.redirect('/passreset'); return;}
     let email = await existsToken(token);
-    console.log(email);
     if (email === false) {
         res.render('invalid-token');
         return;
@@ -53,15 +53,16 @@ routes.get('/:to', async (req, res) => {
 
 //Sending the new password (sent from the form in the new-password page)
 routes.post('/set', async (req, res) => {
+    if(!req.cookies.token) {res.sendStatus(400); return;}
     let token = req.cookies.token;
     res.clearCookie('token');
     let email = await existsToken(token);
+    invalidateURLToken(email);
     if (email === false) {
-        res.render('invalid_token');
+        res.render('invalid-token');
         return;
     }
     let password = req.body.password;
-    console.log(password);
     const hashedPassword = await hashPassword(password);
     let r = await changePassword(email,hashedPassword);
     if(r==='ok') {

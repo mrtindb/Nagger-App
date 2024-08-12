@@ -5,7 +5,6 @@ const express = require('express');
 const routes = express.Router();
 const jwtMiddleware = require('../jwtMiddleware');
 const { getUserNaggers, addNagger, deleteNagger, alterNagger, addDevice, extractDevices } = require('../database');
-const { escapeUserInput } = require('../escaping');
 const { v4: uuidv4 } = require('uuid');
 const { cookie, body, validationResult, matchedData } = require('express-validator');
 
@@ -129,7 +128,9 @@ routes.put('/alterNagger/:id', cookie('jwt').notEmpty().bail().isString().escape
 });
 
 routes.put('/subscribe', cookie('jwt').notEmpty().bail().isString().escape(), jwtMiddleware, async (req, res) => {
+    
     let s = req.body;
+    console.log(s);
     let deviceID = req.cookies.deviceID;
     if (!deviceID) {
 

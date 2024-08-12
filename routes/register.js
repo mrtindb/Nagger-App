@@ -36,7 +36,7 @@ routes.post('/', async (req, res) => {
 
 
     const hashedPassword = await hashPassword(password);
-    const promise = await addUserToDatabase(username, email, hashedPassword, uuidv4());
+    const promise = await addUserToDatabase(username, email, hashedPassword);
     let user = promise[0].userId;
     const token = createJwt(user, username, email);
 

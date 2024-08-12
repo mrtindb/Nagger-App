@@ -1,36 +1,75 @@
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
 <%- include('partials/head'); %>
+  <%- include('partials/inhead'); %>
 
-<body data-bs-theme="dark">
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-    crossorigin="anonymous"></script>
+    <head>
+      <style>
+        #change-password-form {
+          max-width: 30em;
+        }
+        .t {
+          font-weight: bold;
+        }
+      </style>
+    </head>
+
+    <body data-bs-theme="dark">
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
 
       <script>setTheme()</script>
 
-  <!-- top header-->
-  <%- include('partials/header'); %>
-  <!-- Main Container -->
-  <div class="container-fluid" style="min-height: 30em;">
+      <!-- top header-->
+      <%- include('partials/header'); %>
+        <!-- Main Container -->
+        <div class="container-fluid" style="min-height: 30em;">
 
-    <div class="row">
+          <div class="row">
 
-      <!-- Navbar/Navdrawer -->
-    <%- include('partials/navdrawer'); %>
-      <!-- Main Content -->
-      <main class="col">
+            <!-- Navbar/Navdrawer -->
+            <%- include('partials/navdrawer'); %>
+              <!-- Main Content -->
+              <main class="col-md-9 col-lg-10 px-2 px-md-4 py-2 py-md-4">
+                <div class="container">
+                  <h1 class="display-5 my-4">Your Nagger Account</h1>
+                  <div class="container">
+                    
+                    <div><span class="t">Account created on: </span>12.12.2024</div>
+                    <div><span class="t">Account modified on: </span>-</div>
+                    <div><span class="t">Created Naggers: </span>12</div>
 
-      </main>
-    </div>
-  </div>
+                    <form class="my-3" id="change-password-form" action="/account/delete" method="POST">
+                      <div class="form-floating mb-3">
+                        <input placeholder="Enter old password" class="form-control" type="password" name="passwordOld"
+                          id="passwordOld" required>
+                        <label for="passwordOld">Old password</label>
+                      </div>
+                      <div class="form-floating mb-3">
+                        <input placeholder="Enter new password" class="form-control" type="password" name="passwordNew"
+                          id="passwordNew" required minlength="8">
+                        <label for="passwordNew">New password</label>
+                      </div>
+                      <div class="form-floating mb-3">
+                        <input placeholder="Confirm new password" class="form-control" type="password"
+                          name="passwordConf" id="passwordConf" required minlength="8">
+                        <label for="passwordConf">Confirm new password</label>
+                      </div>
+                      <button type="submit" class="btn btn-success">Change Password</button>
+                    </form>
+                  </div>
+                </div>
+              </main>
+          </div>
+        </div>
 
-  <!-- Footer -->
-    <%- include('partials/footer'); %>
+        <!-- Footer -->
+        <%- include('partials/footer'); %>
 
-</body>
+    </body>
 
 </html>

@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="auto">
 
 <%- include('partials/head') %>
-
+<%- include('partials/inhead'); %>
     <body data-bs-theme="dark">
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
             integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
@@ -13,7 +13,7 @@
 
             <script>setTheme()</script>
             <script type="module">
-                import { registerServiceWorker } from 'static/register-sw.js';
+                import { registerServiceWorker } from '/register-sw.js';
                 document.getElementById('enableNotificationsButton').addEventListener('click', registerServiceWorker);
             </script>
         <%- include('partials/header') %>

@@ -21,12 +21,14 @@ routes.get('/',
         let deviceID = req.cookies.deviceID || "";
         let devices = JSON.parse(await extractDevices(req.user.userId)) || [];
 
+        // Check if the deviceID is in the list of devices
         let x = devices.filter(device => device.deviceId === deviceID);
         let set = true;
         if (x.length === 0) {
             set = false;
         }
-
+        
+        // Render the setup page based on if the device is in the list
         res.render('setup', { set });
     });
 module.exports = routes;
