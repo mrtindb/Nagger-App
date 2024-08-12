@@ -4,7 +4,7 @@ export function registerServiceWorker() {
         if (permission === 'granted') {
 
           if ('PushManager' in window) {
-            navigator.serviceWorker.register('/static/service-worker.js').then(function (registration) {
+            navigator.serviceWorker.register('service-worker.js').then(function (registration) {
 
               subscribeUserToPushNotifications();
 
