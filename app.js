@@ -29,6 +29,9 @@ webpush.setVapidDetails(
 app.get('/service-worker.js', (req, res) => {
     res.sendFile(path.join(__dirname, 'sw', 'service-worker.js'));
 });
+app.get('/register-sw.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'sw', 'register-sw.js'));
+});
 app.use('/static',express.static(path.join(__dirname, 'resources')));
 
 
