@@ -26,8 +26,8 @@ webpush.setVapidDetails(
     process.env.PRIVATE_VAPID_KEY
 );
 //Static files 
-app.get('/register-sw.js', (req, res) => {
-    res.sendFile(path.join(__dirname, 'resources', 'register-sw.js'));
+app.get('/service-worker.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'sw', 'service-worker.js'));
 });
 app.use('/static',express.static(path.join(__dirname, 'resources')));
 
