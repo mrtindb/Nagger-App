@@ -4,8 +4,6 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
-
-require('express-async-errors');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const home = require('./routes/home');
@@ -20,11 +18,13 @@ const passreset = require('./routes/passreset');
 const app = express();
 const { extractData, updateNextExecutionTime } = require('./database');
 
+//VAPID keys for notification services
 webpush.setVapidDetails(
     `mailto:${process.env.EMAIL}`,
     process.env.PUBLIC_VAPID_KEY,
     process.env.PRIVATE_VAPID_KEY
 );
+
 //Static files 
 app.get('/service-worker.js', (req, res) => {
     res.sendFile(path.join(__dirname, 'sw', 'service-worker.js'));
@@ -36,8 +36,7 @@ app.use('/static',express.static(path.join(__dirname, 'resources')));
 
 
 
-//Removing trailing slashes
-
+// Middleware setup
 app.use(express.json());
 app.use(cookieParser());
 app.set('view engine', 'ejs');
@@ -47,6 +46,7 @@ app.use(useragent.express());
 app.use('/', home);
 app.use('', home);
 
+//Removing trailing slashes
 app.use((req, res, next) =>     
     {   
         if(req.url==='' || req.url==='/') next();
@@ -66,12 +66,10 @@ app.use('/login', login);
 app.use('/logout', logout);
 app.use('/passreset', passreset);
 app.use('/passreset/static', express.static(path.join(__dirname, 'resources')));
-//app.use('/account', account);
 app.get('/about', (req, res) => { res.render('about') });
 app.use('/setup', require('./routes/setup'));
-const database = require('./database');
 app.use('/account', account);
-
+const database = require('./database');
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -106,15 +104,12 @@ setInterval(async () => {
             let userId = user.userId;
             let naggers = JSON.parse(user.user_data) || [];
             let devices = JSON.parse(user.devices) || [];
-
-            // Loop through all naggers
             let date = new Date();
+            // Loop through all naggers
             naggers.forEach(nagger => {
                 const nextExecution = new Date(nagger.nextExecution);
-
                 if (nextExecution.getTime() < date.getTime()) {
                     updatePromises.push(() => updateNextExecutionTime(userId, nagger.naggerId));
-
                     const payload = {
                         title: nagger.title,
                         body: nagger.description,
@@ -122,7 +117,7 @@ setInterval(async () => {
                             test: 'test'
                         }
                     }
-
+                    // Loop through all devices and sends a notification to each enabled device
                     devices.forEach(device => {
                         if (device.enabled) {
                             webpush.sendNotification(device.s, JSON.stringify(payload)).catch(err => {
@@ -132,6 +127,7 @@ setInterval(async () => {
                 }
             });
         });
+        //Update the next date and time for a notification to be sent for all naggers that are due on the current function call
         await Promise.all(updatePromises.map(fn => fn()));
     });
 

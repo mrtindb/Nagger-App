@@ -14,6 +14,7 @@ routes.get('/',
     cookie('deviceID').optional().isUUID(),
 
     async (req, res) => {
+        // If there are errors in the validation result, redirect
         if (!validationResult(req).isEmpty()) {
             return res.redirect('/login');
         }

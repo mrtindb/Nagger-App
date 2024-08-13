@@ -4,7 +4,7 @@ const mysql = require('mysql2');
 const nextExecution = require('./scheduler');
 const { validate } = require('uuid');
 var con = mysql.createConnection({
-    host: process.env.DB_HOST,
+    host: process.env.DB_LOCALHOST,
     user: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
 });
@@ -14,12 +14,12 @@ function connectToDatabase() {
     con.connect(function (err) {
         if (err) throw err;
     })
-    con.query("USE dbnagger", function (err, result) {
+    con.query("USE nagger", function (err, result) {
         if (err) throw err;
     })
 }
 
-/** Adds new user to database @param {String} username  @param email @param hashedPassword @param notificationIdentifier */
+/** Adds new user to database @param {string} password - the hashed password */
 async function addUserToDatabase(username, email, password) {
 
     var t = new Date(Date.now());
@@ -42,10 +42,10 @@ async function addUserToDatabase(username, email, password) {
     return await promise;
 }
 
-/** Returns the hashed password @ */
+/** Returns the hashed password and the userId */
 async function extractUserPassword(username, email) {
     let promise = new Promise((resolve, reject) => {
-        con.query(`SELECT password, userId FROM users WHERE username = ? OR email = ?`, [username, email], function (err, result) {
+        con.query(`SELECT password, userId, email FROM users WHERE username = ? OR email = ?`, [username, email], function (err, result) {
             if (err) throw err;
             if (result.length === 0) {
                 resolve("error");
@@ -57,6 +57,7 @@ async function extractUserPassword(username, email) {
     return await promise;
 }
 
+/** Checks if the username is available @returns true if there is no such username in the DB, false otherwise */
 async function checkUsernameAvailability(username) {
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT username, email FROM users WHERE username = ?`, [username], function (err, result) {
@@ -72,6 +73,7 @@ async function checkUsernameAvailability(username) {
     return await promise;
 };
 
+/** Checks if the email is available @returns true if there is no such email in the DB, false otherwise */
 async function checkEmailAvailability(email) {
     let promise = new Promise((resolve, reject) => {
 
@@ -88,6 +90,7 @@ async function checkEmailAvailability(email) {
     return await promise;
 };
 
+/** Returns the naggers of the user */
 async function getUserNaggers(userId) {
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
@@ -131,6 +134,7 @@ async function addNagger(userId, nagger) {
     return await promise;
 }
 
+/** Deletes a nagger */
 async function deleteNagger(userId, naggerId) {
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
@@ -147,6 +151,8 @@ async function deleteNagger(userId, naggerId) {
     return await promise;
 }
 
+/** Alters a nagger based on userId and naggerId, the newNagger param must be provided
+ *  as JSON and have at least the fields: @field title @field description @field severity @field nextExecution */
 async function alterNagger(userId, naggerId, newNagger) {
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
@@ -167,6 +173,7 @@ async function alterNagger(userId, naggerId, newNagger) {
     return await promise;
 }
 
+/** Updates the next execution time of a nagger, must be called on every notification trigger */
 function updateNextExecutionTime(userId, naggerId) {
     return new Promise((resolve, reject) => {
         con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
@@ -185,6 +192,9 @@ function updateNextExecutionTime(userId, naggerId) {
     });
 }
 
+/** Adds a new device to the user @param {JSON} s JSON object returned from the Push API that comes from the client upon subscription
+ * @param {JSON} deviceInfo JSON object that contains user agent information
+ */
 async function addDevice(userId, deviceId, deviceInfo, s) {
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT devices FROM users WHERE userId = ?`, [userId], function (err, result) {
@@ -215,6 +225,7 @@ async function addDevice(userId, deviceId, deviceInfo, s) {
     return await promise;
 }
 
+/** Extracts the userId, devices and user data  */
 async function extractData() {
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT userId, user_data, devices FROM users`, function (err, result) {
@@ -235,6 +246,7 @@ async function extractDevices(userId) {
     return await promise;
 }
 
+/** Changes the device state @param {boolean} state is the new state of the device, where true is enabled and false - disabled  */
 async function changeDeviceState(userId, deviceId, state) {
     let promise = new Promise(async (resolve, reject) => {
         let devices = JSON.parse(await extractDevices(userId));
@@ -250,19 +262,20 @@ async function changeDeviceState(userId, deviceId, state) {
     return await promise;
 }
 
+/** Stores a new URL Token in the DB associated with a user email, that has a limited lifespan and is to be used for password reseting */
 async function storeURLToken(email, token) {
     let date = new Date(Date.now());
     date.setMinutes = date.getMinutes + 15;
     let promise = new Promise(async (resolve, reject) => {
         con.query('SELECT * FROM reset_tokens WHERE email=?', [email], (err, result) => {
             if (result.length !== 0) {
-                con.query('UPDATE reset_tokens SET token=?,valid=? WHERE email=?', [token, JSON.stringify({validUntil:date}), email], (err, result) => {
+                con.query('UPDATE reset_tokens SET token=?,valid=? WHERE email=?', [token, JSON.stringify({ validUntil: date }), email], (err, result) => {
                     if (err) throw err;
                     resolve('ok');
                 })
             }
             else {
-                con.query('INSERT INTO reset_tokens VALUES (?,?,?)', [email, token, JSON.stringify({validUntil:date})], (err, result) => {
+                con.query('INSERT INTO reset_tokens VALUES (?,?,?)', [email, token, JSON.stringify({ validUntil: date })], (err, result) => {
                     if (err) throw err;
                     resolve('ok');
                 })
@@ -273,16 +286,17 @@ async function storeURLToken(email, token) {
     })
 }
 
-async function existsToken(token){
-    let promise = new Promise((resolve,reject)=>{
-        con.query("SELECT email,valid FROM reset_tokens WHERE token = ?", [token], (err,result) => {    
-            if(err) throw err;
-            if(result.length==0) {
-                resolve (false);
+/** Checks if a token exists and is valid, returns the email associated with the token, false otherwise */
+async function existsToken(token) {
+    let promise = new Promise((resolve, reject) => {
+        con.query("SELECT email,valid FROM reset_tokens WHERE token = ?", [token], (err, result) => {
+            if (err) throw err;
+            if (result.length == 0) {
+                resolve(false);
                 return;
             }
             let date = new Date(Date.now());
-            if(JSON.parse(result[0].valid).validUntil<date) {
+            if (JSON.parse(result[0].valid).validUntil < date) {
                 resolve(false);
             }
             else resolve(result[0].email);
@@ -291,34 +305,71 @@ async function existsToken(token){
     return await promise;
 }
 
-async function changePassword(email,password){
-    let promise = new Promise((resolve,reject) => {
-        con.query("UPDATE users SET password = ? WHERE email = ?", [password,email], (err,result)=>{
-            if(err) throw err;
+/** Changes the password of a user */
+async function changePassword(email, password) {
+    let promise = new Promise((resolve, reject) => {  
+        con.query("UPDATE users SET password = ? WHERE email = ?", [password, email], (err, result) => {
+            if (err) throw err;
             resolve('ok');
         })
     })
     return await promise;
 }
 
-async function invalidateURLToken(email){
-    let promise = new Promise((resolve,reject)=>{
-        con.query("DELETE FROM reset_tokens WHERE email = ?", [email], (err,result)=>{
-            if(err) throw err;
+/** Invalidates a URL token, deleting the record from the table entirely */
+async function invalidateURLToken(email) {
+    let promise = new Promise((resolve, reject) => {
+        con.query("DELETE FROM reset_tokens WHERE email = ?", [email], (err, result) => {
+            if (err) throw err;
             resolve('ok');
         })
     });
     return await promise;
 }
 
-async function getAccountCreationDate(userId) {
+/** Returns account creation date, account edit date and last nagger id. This is all the information for backend rendering of the account page */
+async function getAccountDetails(userId) {
     let promise = new Promise((resolve, reject) => {
-        con.query(`SELECT acc_created_on FROM users WHERE userId = ?`, [userId], function (err, result) {
+        con.query(`SELECT acc_created_on, acc_edited_on, nagger_last_id FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
-            resolve(result[0].acc_created_on);
+            resolve(result[0]);
         });
     });
     return await promise;
 }
 
-module.exports = { getAccountCreationDate, invalidateURLToken,changePassword,existsToken,storeURLToken, changeDeviceState, extractDevices, updateNextExecutionTime, extractData, addDevice, alterNagger, deleteNagger, addNagger, connectToDatabase, addUserToDatabase, extractUserPassword, checkEmailAvailability, checkUsernameAvailability, getUserNaggers };
+/** Updates account edit date to the current date. Designed to be called immediately after an account edit */
+async function accountEditDate(email) {
+    let promise = new Promise((resolve, reject) => {
+        let t = new Date(Date.now());
+        let formattedDate = t.toISOString().split('T')[0];
+        con.query("UPDATE users SET acc_edited_on = ? WHERE email = ?", [formattedDate, email], (err, result) => {
+            if (err) throw err;
+            resolve('ok');
+        })
+    })
+    return await promise;
+}
+
+module.exports = {
+    accountEditDate,
+    getAccountDetails,
+    invalidateURLToken,
+    changePassword,
+    existsToken,
+    storeURLToken,
+    changeDeviceState,
+    extractDevices,
+    updateNextExecutionTime,
+    extractData,
+    addDevice,
+    alterNagger,
+    deleteNagger,
+    addNagger,
+    connectToDatabase,
+    addUserToDatabase,
+    extractUserPassword,
+    checkEmailAvailability,
+    checkUsernameAvailability,
+    getUserNaggers
+};

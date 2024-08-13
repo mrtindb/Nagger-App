@@ -8,6 +8,7 @@
         #change-password-form {
           max-width: 30em;
         }
+
         .t {
           font-weight: bold;
         }
@@ -23,7 +24,10 @@
         crossorigin="anonymous"></script>
 
       <script>setTheme()</script>
-
+      <script type="module">
+        import { changePassword } from '/static/account.js';
+        document.getElementById('changeButton').addEventListener('click', changePassword);
+      </script>
       <!-- top header-->
       <%- include('partials/header'); %>
         <!-- Main Container -->
@@ -38,10 +42,16 @@
                 <div class="container">
                   <h1 class="display-5 my-4">Your Nagger Account</h1>
                   <div class="container">
-                    
-                    <div><span class="t">Account created on: </span>12.12.2024</div>
-                    <div><span class="t">Account modified on: </span>-</div>
-                    <div><span class="t">Created Naggers: </span>12</div>
+
+                    <div><span class="t">Account created on: </span>
+                      <%= creationDate %>
+                    </div>
+                    <div><span class="t">Account modified on: </span>
+                      <%= editDate %>
+                    </div>
+                    <div><span class="t">Created Naggers: </span>
+                      <%= naggerCount %>
+                    </div>
 
                     <form class="my-3" id="change-password-form" action="/account/delete" method="POST">
                       <div class="form-floating mb-3">
@@ -59,8 +69,24 @@
                           name="passwordConf" id="passwordConf" required minlength="8">
                         <label for="passwordConf">Confirm new password</label>
                       </div>
-                      <button type="submit" class="btn btn-success">Change Password</button>
+                      <button type="button" class="btn btn-success mb-3" id="changeButton">Change Password</button>
+
+                      <div class="alert alert-success d-none" id="password-changed-alert">
+                        <p style="margin:0">
+                          Password changed successfully.
+                        </p>
+                      </div>
+                      
+                      <div class="alert alert-danger d-none" id="error-alert">
+                        <p style="margin:0" id='error-message'>
+                          
+                        </p>
+                      </div>
+
                     </form>
+
+
+
                   </div>
                 </div>
               </main>

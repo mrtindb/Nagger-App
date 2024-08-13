@@ -2,20 +2,11 @@
 
 const express = require('express');
 const routes = express.Router();
-const { checkEmailAvailability, storeURLToken, existsToken, changePassword, invalidateURLToken } = require('../database');
+const { checkEmailAvailability, storeURLToken, existsToken, changePassword, invalidateURLToken, accountEditDate } = require('../database');
 const sendMail = require('../mail');
 const crypto = require('crypto');
 const path = require('path');
 const { hashPassword } = require('../passwordhashing');
-
-
-//Static files
-/*
-routes.get('/favicon.svg', (req, res) => {
-    console.log('dogs');
-    res.sendFile(path.join(__dirname, 'public/favicon.svg'));  // Adjust the path based on your project structure
-});
-*/
 
 //Getting the page to reset the password
 routes.get('/', async (req, res) => {
@@ -66,6 +57,7 @@ routes.post('/set', async (req, res) => {
     const hashedPassword = await hashPassword(password);
     let r = await changePassword(email,hashedPassword);
     if(r==='ok') {
+        accountEditDate(email);
         res.render('pass-changed');
         return;
     }

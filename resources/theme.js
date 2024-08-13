@@ -1,7 +1,8 @@
 var theme = undefined;
 var params = new URLSearchParams(window.location.search);
-function setTheme() {
 
+// Set the theme based on the URL
+function setTheme() {
   theme = params.get('theme');
   if (!theme) theme = 'light';
   if(theme==='light') theme='light';
@@ -13,6 +14,7 @@ function setTheme() {
   document.addEventListener("DOMContentLoaded", () => updateLinks());
 }
 
+// Changes theme and updates URL
 function changeTheme() {
   if (theme === 'light') theme = 'dark';
   else theme = 'light';
@@ -23,6 +25,7 @@ function changeTheme() {
   updateLinks();
 }
 
+// Update the links to reflect the current theme
 function updateLinks() {
   if (theme === 'light') theme = 'light';
   else theme = 'dark';

@@ -27,7 +27,6 @@ routes.get('/',
 
             set = false;
         }
-        //console.log(naggers);
         if (naggers.length === 0) {
             res.render('home', { naggers: false, set });
         }
@@ -54,7 +53,6 @@ routes.post('/addNagger',
         }
 
         if (!validationResult(req).isEmpty()) {
-            console.log(validationResult(req));
             res.status(400).send('Bad Request');
             return;
         }
@@ -90,7 +88,6 @@ routes.delete('/deleteNagger/:id',
         let userId = req.user.userId;
 
         let result = await deleteNagger(userId, naggerId);
-        console.log('home');
         if (result === "ok") {
             res.sendStatus(204);
         }
@@ -130,7 +127,7 @@ routes.put('/alterNagger/:id', cookie('jwt').notEmpty().bail().isString().escape
 routes.put('/subscribe', cookie('jwt').notEmpty().bail().isString().escape(), jwtMiddleware, async (req, res) => {
     
     let s = req.body;
-    console.log(s);
+    //console.log(s);
     let deviceID = req.cookies.deviceID;
     if (!deviceID) {
 

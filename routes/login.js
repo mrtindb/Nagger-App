@@ -23,6 +23,7 @@ routes.post('/', async (req, res) => {
     let match = await comparePasswords(password, hashedPassword[0].password);
     let userId = hashedPassword[0].userId;
     if (match) {
+        email = hashedPassword[0].email;
         const token = createJwt(userId, username, email);
         res.cookie('jwt', token, { httpOnly: true, secure: true });
         res.redirect('/home');

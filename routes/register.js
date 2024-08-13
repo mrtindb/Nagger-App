@@ -34,7 +34,6 @@ routes.post('/', async (req, res) => {
         return;
     }
 
-
     const hashedPassword = await hashPassword(password);
     const promise = await addUserToDatabase(username, email, hashedPassword);
     let user = promise[0].userId;

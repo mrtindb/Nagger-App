@@ -5,25 +5,6 @@ var currentNaggerId;
 document.addEventListener('DOMContentLoaded', function () {
     let setupAlert = document.getElementById('setupAlert');
 
-    //Check if a service worker is already registered
-    if ('serviceWorker' in navigator) {
-        let isRegistered = false;
-        navigator.serviceWorker.getRegistrations().then(function (registrations) {
-
-            for (let registration of registrations) {
-
-                if (registration && registration.active && registration.active.scriptURL === 'https://localhost:3000/service-worker.js') {
-                    isRegistered = true;
-
-                    break;
-                }
-            }
-            if (!isRegistered) {
-                setupAlert.classList.remove('d-none');
-                setupAlert.classList.add('d-flex');
-            }
-        })
-    }
 
     currentNaggerId = -1;
 

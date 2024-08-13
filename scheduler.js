@@ -1,5 +1,6 @@
 'use strict';
 
+/** Returns the datetime when a nagger must be sent as a notification, based on its severity */
 function nextExecution(interval){
     let date = new Date();
 
