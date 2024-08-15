@@ -9,7 +9,7 @@ function jwtMiddleware(req, res, next) {
         return res.redirect('/logout');
     }
     
-    const token = matchedData(req).jwt;
+    const token = req.cookies.jwt;
 
     if(!token) {
         return res.redirect('/logout');

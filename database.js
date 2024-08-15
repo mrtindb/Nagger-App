@@ -43,9 +43,9 @@ async function addUserToDatabase(username, email, password) {
 }
 
 /** Returns the hashed password and the userId */
-async function extractUserPassword(username, email) {
+async function extractUserPassword(email) {
     let promise = new Promise((resolve, reject) => {
-        con.query(`SELECT password, userId, email FROM users WHERE username = ? OR email = ?`, [username, email], function (err, result) {
+        con.query(`SELECT password, userId, username FROM users WHERE email = ?`, [email], function (err, result) {
             if (err) throw err;
             if (result.length === 0) {
                 resolve("error");

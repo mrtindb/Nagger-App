@@ -9,7 +9,7 @@ const { cookie, body, validationResult, matchedData } = require('express-validat
 //Validated
 routes.get('/', cookie('jwt').notEmpty().bail().isString(), jwtMiddleware, async (req, res) => {
     //Comes from jwtMiddleware
-    let userId = matchedData(user).userId;
+    let userId = req.user.userId;
     let devices = JSON.parse(await extractDevices(userId));
     res.render('devices', { devices });
 });
@@ -24,7 +24,7 @@ routes.put('/changeState',
     jwtMiddleware,
     async (req, res) => {
     //Comes from jwtMiddleware
-    let userId = matchedData(user).userId;
+    let userId = req.user.userId;
     if(validationResult(req).isEmpty() === false) {
         res.status(400).send('Bad Request');
         return;

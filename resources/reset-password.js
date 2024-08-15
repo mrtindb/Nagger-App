@@ -5,7 +5,6 @@ async function resetPassword() {
         alert.classList.add('d-none');
     }, 4000);
     let address = document.getElementById('email').value;
-    console.log(address);
     await fetch('/passreset', {
         method: 'POST',
         headers: {

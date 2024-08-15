@@ -68,6 +68,5 @@ export function registerServiceWorker() {
     for (let i = 0; i < rawData.length; ++i) {
       outputArray[i] = rawData.charCodeAt(i);
     }
-    console.log(outputArray);
     return outputArray;
   }

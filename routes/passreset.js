@@ -6,9 +6,8 @@ const { checkEmailAvailability, storeURLToken, existsToken, changePassword, inva
 const sendMail = require('../mail');
 const crypto = require('crypto');
 const path = require('path');
-const { hashPassword } = require('../passwordhashing');
 const { body, validationResult, matchedData, cookie, param } = require('express-validator');
-const { match } = require('assert');
+const {hashPassword} = require('../passwordhashing');
 
 //Getting the page to reset the password
 routes.get('/', async (req, res) => {
@@ -17,7 +16,7 @@ routes.get('/', async (req, res) => {
 
 //Creating the URL Token and sending Email (sent from the form in the passreset page)
 routes.post('/',
-    body('address').isEmail().normalizeEmail(),
+    body('address').isLength({min:3, max:99}).isEmail().normalizeEmail(),
      async (req, res) => {
     const address = matchedData(req).address;
     let userExists = await checkEmailAvailability(address);
@@ -63,7 +62,6 @@ routes.post('/set',
     async (req, res) => {
 
     if (!validationResult(req).isEmpty()) {
-        console.log(validationResult(req).array());
         res.clearCookie('token');
         res.sendStatus(400);
         return;
@@ -78,6 +76,7 @@ routes.post('/set',
         return;
     }
     let password = req.body.password;
+
     const hashedPassword = await hashPassword(password);
     let r = await changePassword(email, hashedPassword);
     if (r === 'ok') {

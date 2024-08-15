@@ -17,8 +17,8 @@ routes.get('/', async (req, res) => {
 //Validated
 routes.post('/',
     
-    body('username').isString().isLength({ min: 3, max: 49 }),
-    body('email').isEmail().normalizeEmail(),
+    body('username').isString().isLength({ min: 3, max: 99 }),
+    body('email').isLength({min:3,max:99}).isEmail().normalizeEmail(),
     body('password').isString().isLength({ min: 8, max: 49 }),
 
     async (req, res) => {
@@ -30,18 +30,8 @@ routes.post('/',
     const { username, email, password } = matchedData(req);
 
     //TODO: Add validation for incoming data
-
-    let userExists = await checkUsernameAvailability(username);
     let emailExists = await checkEmailAvailability(email);
 
-    if (!userExists && !emailExists) {
-        res.render('register', { errorFlag: true, errorMessage: "Username and email already in use" });
-        return;
-    }
-    if (!userExists) {
-        res.render('register', { errorFlag: true, errorMessage: "Username already in use" });
-        return;
-    }
     if (!emailExists) {
         res.render('register', { errorFlag: true, errorMessage: "Email already in use" });
         return;

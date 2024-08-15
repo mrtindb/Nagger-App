@@ -16,18 +16,19 @@ routes.get('/', async (req, res) => {
 //Validated
 routes.post('/', 
     
-    body('username').isString().isLength({ min: 3, max: 49 }),
+    body('email').isString().isLength({ min: 3, max: 99 }).isEmail().normalizeEmail(),
     body('password').isString().isLength({ min: 8, max: 49 }),
 
     async (req, res) => {
-    //Username can be email or username
+
     if(!validationResult(req).isEmpty()){
         res.render('login', { invalidCredentials: true });
         return;
     }
-    const { username, password } = matchedData(req);
-    const email = username;
-    const hashedPassword = await extractUserPassword(username, email);
+    const email = matchedData(req).email;
+    const password = req.body.password;
+    
+    const hashedPassword = await extractUserPassword(email);
     if (hashedPassword === "error") {
         res.render('login', { invalidCredentials: true });
         return;
@@ -35,8 +36,8 @@ routes.post('/',
     let match = await comparePasswords(password, hashedPassword[0].password);
     let userId = hashedPassword[0].userId;
     if (match) {
-        email = hashedPassword[0].email;
-        const token = createJwt(userId, username, email);
+        let name = hashedPassword[0].username;
+        const token = createJwt(userId, name, email);
         res.cookie('jwt', token, { httpOnly: true, secure: true });
         res.redirect('/home');
     }

@@ -11,13 +11,13 @@ const { cookie, body, validationResult, matchedData } = require('express-validat
 //Validated
 routes.get('/', cookie('jwt').notEmpty().bail().isString(), jwtMiddleware, async (req, res) => {
     //Comes from jwtMiddleware
-    let userId = matchedData(user).userId;
+    let userId = req.user.userId;
     let accountDetails = await getAccountDetails(userId);
     let creationDate = accountDetails.acc_created_on;
     let editDate = accountDetails.acc_edited_on || 'never';
     let naggerCount = accountDetails.nagger_last_id+1;
     creationDate = creationDate.toISOString().split('T')[0].split('-').reverse().join('/');
-    editDate = editDate.toISOString().split('T')[0].split('-').reverse().join('/') || 'never';
+    if(editDate!=='never') editDate = editDate.toISOString().split('T')[0].split('-').reverse().join('/');
     res.render('account', { creationDate, editDate, naggerCount });
 });
 
@@ -30,7 +30,7 @@ routes.post('/',
 
     jwtMiddleware, async (req, res) => {
     //Comes from jwtMiddleware
-    const user = matchedData(user);
+    const user = req.user;
 
     if(validationResult(req).isEmpty() === false) {
         res.status(400).send('Bad Request');
@@ -38,7 +38,7 @@ routes.post('/',
     }
     const { oldPassword, newPassword } = matchedData(req);
 
-    const userData = await extractUserPassword(user.username, user.email);
+    const userData = await extractUserPassword(user.email);
     const match = await comparePasswords(oldPassword, userData[0].password);
 
     if (!match) {

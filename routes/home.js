@@ -19,7 +19,6 @@ routes.get('/',
     async (req, res) => {
 
         const userData = req.user; //Coming from jwtMiddleware
-        console.log(userData);
         const naggers = await getUserNaggers(userData.userId);
         let deviceID = req.cookies.deviceID || "";
         let devices = JSON.parse(await extractDevices(userData.userId)) || [];
@@ -107,7 +106,6 @@ routes.put('/alterNagger/:id',
     jwtMiddleware, 
     async (req, res) => {
     if (!req.params.id || !validationResult(req).isEmpty()) {
-        console.log(validationResult(req).array());
         res.status(400).send('Bad Request');
         return;
     }
@@ -138,21 +136,20 @@ routes.put('/alterNagger/:id',
 
 routes.put('/subscribe', 
     
-    cookie('jwt').notEmpty().bail().isString(),
-    body().isJSON(), 
-    body('keys').isJSON(),
+
     body('keys.auth').isString(),
     body('keys.p256dh').isString(),
     body('endpoint').isString().isURL(),
+    cookie('jwt').notEmpty().bail().isString(),
     jwtMiddleware, 
     async (req, res) => {
     if(!validationResult(req).isEmpty()) {
+        console.log(validationResult(req).array());
         res.status(400).send('Bad Request');
         return;
     }
     //s is the subscription object containing the endpoint for notifications and other information
     let s = req.body;
-    console.log(s);
     let deviceID = req.cookies.deviceID;
     if (!deviceID) {
         deviceID = uuidv4();
