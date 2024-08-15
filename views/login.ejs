@@ -38,13 +38,13 @@
             <h1 class="h3 mb-3 fw-normal">Log in</h1>
             
             <div class="mb-3 form-floating">
-              <input type="text" class="form-control" name="username" required id="email" aria-describedby="emailHelp"
+              <input type="text" class="form-control" name="username" minlength="3" maxlength="99" required id="email" aria-describedby="emailHelp"
                 placeholder="Enter email or username">
               <label for="email" class="form-label">Email or Username</label>
             </div>
 
             <div class="mb-3 form-floating">
-              <input type="password" name="password" class="form-control" id="password" required placeholder="Password">
+              <input type="password" name="password" minlength="8" maxlength="49" class="form-control" id="password" required placeholder="Password">
               <label for="password" class="form-label">Password</label>
             </div>
             <% if(invalidCredentials) { %>

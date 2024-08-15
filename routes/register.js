@@ -6,15 +6,28 @@ const routes = express.Router();
 const createJwt = require('../createjwt');
 const { addUserToDatabase, checkEmailAvailability, checkUsernameAvailability, addDevice } = require('../database');
 const { hashPassword } = require('../passwordhashing');
+const { body, validationResult, matchedData } = require('express-validator');
 const { v4: uuidv4 } = require('uuid');
 
+//Validated
 routes.get('/', async (req, res) => {
     res.render('register', { errorFlag: false, errorMessage: "" });
 });
 
-routes.post('/', async (req, res) => {
-    const { username, email, password } = req.body;
-    const deviceID = req.cookies.deviceID;
+//Validated
+routes.post('/',
+    
+    body('username').isString().isLength({ min: 3, max: 49 }),
+    body('email').isEmail().normalizeEmail(),
+    body('password').isString().isLength({ min: 8, max: 49 }),
+
+    async (req, res) => {
+
+    if (!validationResult(req).isEmpty()) {
+        res.render('register', { errorFlag: true, errorMessage: "Invalid input" });
+        return;
+    }
+    const { username, email, password } = matchedData(req);
 
     //TODO: Add validation for incoming data
 

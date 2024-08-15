@@ -6,13 +6,13 @@ function jwtMiddleware(req, res, next) {
     const result = validationResult(req);
     //If there are errors in the validation result, redirect to login
     if(!result.isEmpty()) {
-        return res.redirect('/login');
+        return res.redirect('/logout');
     }
     
     const token = matchedData(req).jwt;
 
     if(!token) {
-        return res.redirect('/login');
+        return res.redirect('/logout');
     }
 
     // Token verification. If this fails, redirect to login, otherwise proceed to the next middleware
@@ -22,7 +22,7 @@ function jwtMiddleware(req, res, next) {
         next();
     }
     catch(err) {
-        return res.redirect('/login');
+        return res.redirect('/logout');
     }
 };
 

@@ -4,18 +4,33 @@ const express = require('express');
 const routes = express.Router();
 const jwtMiddleware = require('../jwtMiddleware');
 const { extractDevices, changeDeviceState } = require('../database');
-const { cookie } = require('express-validator');
+const { cookie, body, validationResult, matchedData } = require('express-validator');
 
-routes.get('/', cookie('jwt').notEmpty().bail().isString().escape(), jwtMiddleware, async (req, res) => {
-    let userId = req.user.userId;
+//Validated
+routes.get('/', cookie('jwt').notEmpty().bail().isString(), jwtMiddleware, async (req, res) => {
+    //Comes from jwtMiddleware
+    let userId = matchedData(user).userId;
     let devices = JSON.parse(await extractDevices(userId));
     res.render('devices', { devices });
 });
 
-routes.put('/changeState', cookie('jwt').notEmpty().bail().isString().escape(), jwtMiddleware, async (req, res) => {
-    let userId = req.user.userId;
-    let body = req.body;
-    changeDeviceState(userId, body.deviceId, body.state);
+//Validated
+routes.put('/changeState', 
+    
+    cookie('jwt').notEmpty().bail().isString(),
+    body('deviceId').isString().isUUID(),
+    body('state').isBoolean(),
+
+    jwtMiddleware,
+    async (req, res) => {
+    //Comes from jwtMiddleware
+    let userId = matchedData(user).userId;
+    if(validationResult(req).isEmpty() === false) {
+        res.status(400).send('Bad Request');
+        return;
+    }
+    const { deviceId, state } = matchedData(req);
+    changeDeviceState(userId, deviceId, state);
     res.sendStatus(204);
 });
 

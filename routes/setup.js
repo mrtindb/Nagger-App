@@ -8,10 +8,11 @@ const { cookie, validationResult, matchedData } = require('express-validator');
 
 routes.get('/',
 
-    cookie('jwt').notEmpty().bail().isString().escape(),
-    jwtMiddleware,
-    cookie('set').default('false'),
     cookie('deviceID').optional().isUUID(),
+    cookie('jwt').notEmpty().bail().isString(),
+    jwtMiddleware,
+    //cookie('set').default('false'),
+    
 
     async (req, res) => {
         // If there are errors in the validation result, redirect

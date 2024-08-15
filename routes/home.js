@@ -6,18 +6,20 @@ const routes = express.Router();
 const jwtMiddleware = require('../jwtMiddleware');
 const { getUserNaggers, addNagger, deleteNagger, alterNagger, addDevice, extractDevices } = require('../database');
 const { v4: uuidv4 } = require('uuid');
-const { cookie, body, validationResult, matchedData } = require('express-validator');
+const { cookie, body, validationResult, matchedData, param } = require('express-validator');
 
-//Validation done
+//Validated
 routes.get('/',
-    cookie('jwt').notEmpty().bail().isString().escape(),
+
+    cookie('jwt').notEmpty().bail().isString(),
     jwtMiddleware,
-    cookie('set').isString().custom(v => { if (v !== 'true' && v !== 'false') throw new Error('wrong format') }),
+    //cookie('set').isString().custom(v => { if (v !== 'true' && v !== 'false') throw new Error('wrong format') }),
     cookie('deviceID').isString().isUUID(),
+    
     async (req, res) => {
 
         const userData = req.user; //Coming from jwtMiddleware
-
+        console.log(userData);
         const naggers = await getUserNaggers(userData.userId);
         let deviceID = req.cookies.deviceID || "";
         let devices = JSON.parse(await extractDevices(userData.userId)) || [];
@@ -35,17 +37,16 @@ routes.get('/',
         }
     });
 
-//Validation done
+//Validated
 routes.post('/addNagger',
 
-    cookie('jwt').notEmpty().bail().isString().escape(),
-    jwtMiddleware,
-
-    body('title').isString().isLength({ min: 0, max: 15 }).escape(),
-    body('description').isString().isLength({ min: 0, max: 90 }).escape(),
+    cookie('jwt').notEmpty().bail().isString(),
+    body('title').isString().isLength({ min: 0, max: 15 }),
+    body('description').isString().isLength({ min: 0, max: 90 }),
     body('severity').isInt().isIn([0, 1, 2, 3, 4, 5]),
     body('naggerDate').matches(/^([1-9]|([012][0-9])|(3[01]))\-([0]{0,1}[1-9]|1[012])\-\d\d\d\d\s([0-1]?[0-9]|2?[0-3]):([0-5]\d)$/),
-
+    
+    jwtMiddleware,
     async (req, res) => {
         if (typeof req.body !== 'object') {
             res.status(400).send('Bad Request');
@@ -57,8 +58,8 @@ routes.post('/addNagger',
             return;
         }
 
-        let naggerTitle = matchedData(req).title || 'Untitled';
-        let naggerDescription = matchedData(req).description || 'No description';
+        let naggerTitle = req.body.title || 'Untitled';
+        let naggerDescription = req.body.description || 'No description';
         let naggerSeverity = req.body.severity || 1;
         let naggerDate = req.body.naggerDate || new Date();
 
@@ -74,19 +75,20 @@ routes.post('/addNagger',
 
     });
 
+//Validated
 routes.delete('/deleteNagger/:id',
 
-    cookie('jwt').notEmpty().bail().isString().escape(), jwtMiddleware,
+    cookie('jwt').notEmpty().bail().isString(),
+    param('id').isInt(),
 
+    jwtMiddleware,
     async (req, res) => {
-        if (!req.params.id) {
+        if (!req.params.id || !validationResult(req).isEmpty()) {
             res.status(400).send('Bad Request');
             return;
         }
         let naggerId = req.params.id;
-
         let userId = req.user.userId;
-
         let result = await deleteNagger(userId, naggerId);
         if (result === "ok") {
             res.sendStatus(204);
@@ -94,23 +96,33 @@ routes.delete('/deleteNagger/:id',
         else res.sendStatus(400);
     });
 
-routes.put('/alterNagger/:id', cookie('jwt').notEmpty().bail().isString().escape(), jwtMiddleware, async (req, res) => {
-    if (!req.params.id) {
+//Validated
+routes.put('/alterNagger/:id', 
+    
+    cookie('jwt').notEmpty().bail().isString(), 
+    param('id').isInt(),
+    body('title').isString().isLength({ min: 0, max: 15 }),
+    body('description').isString().isLength({ min: 0, max: 90 }),
+    body('severity').isInt().isIn([0, 1, 2, 3, 4, 5]),
+    jwtMiddleware, 
+    async (req, res) => {
+    if (!req.params.id || !validationResult(req).isEmpty()) {
+        console.log(validationResult(req).array());
         res.status(400).send('Bad Request');
         return;
     }
+
     let naggerId = req.params.id;
     let userId = req.user.userId;
-    let nagger = req.body;
 
-    let naggerTitle = nagger.title || 'Untitled';
-    let naggerDescription = nagger.description || 'No description';
-    let naggerSeverity = nagger.severity || 1;
+    let naggerTitle = req.body.title || 'Untitled';
+    let naggerDescription = req.body.description || 'No description';
+    let naggerSeverity = req.body.severity || 1;
 
     let newNagger =
     {
-        title: escapeUserInput(naggerTitle),
-        description: escapeUserInput(naggerDescription),
+        title: naggerTitle,
+        description: naggerDescription,
         severity: naggerSeverity
     }
 
@@ -120,23 +132,34 @@ routes.put('/alterNagger/:id', cookie('jwt').notEmpty().bail().isString().escape
         res.sendStatus(204);
     }
     else {
-        res.status(400);
+        res.sendStatus(400);
     }
 });
 
-routes.put('/subscribe', cookie('jwt').notEmpty().bail().isString().escape(), jwtMiddleware, async (req, res) => {
+routes.put('/subscribe', 
     
+    cookie('jwt').notEmpty().bail().isString(),
+    body().isJSON(), 
+    body('keys').isJSON(),
+    body('keys.auth').isString(),
+    body('keys.p256dh').isString(),
+    body('endpoint').isString().isURL(),
+    jwtMiddleware, 
+    async (req, res) => {
+    if(!validationResult(req).isEmpty()) {
+        res.status(400).send('Bad Request');
+        return;
+    }
+    //s is the subscription object containing the endpoint for notifications and other information
     let s = req.body;
-    //console.log(s);
+    console.log(s);
     let deviceID = req.cookies.deviceID;
     if (!deviceID) {
-
         deviceID = uuidv4();
     }
     const expiryDate = new Date(2037, 0, 1);
     addDevice(req.user.userId, deviceID, req.useragent, s);
     res.cookie('deviceID', deviceID, { httpOnly: true, secure: true, expires: expiryDate });
-    res.cookie('set', true, { secure: true, expires: expiryDate });
     res.status(201).json({ status: 'ok' });
     return;
 });

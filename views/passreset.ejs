@@ -1,3 +1,6 @@
+
+<% //This page is displayed upon clicking the 'forgot password' link. Here the user must provide an email for a reset link %>
+
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
 <%- include('partials/head'); %>
@@ -40,7 +43,7 @@
               <h1 class="h3 mb-3 fw-normal">Reset Password</h1>
 
               <div class="mb-3 form-floating">
-                <input type="text" class="form-control" name="username" required id="email" aria-describedby="emailHelp"
+                <input type="text" minlength="3" maxlength="99" class="form-control" name="username" required id="email" aria-describedby="emailHelp"
                   placeholder="Enter email or username">
                 <label for="emailTextField" class="form-label">Email</label>
               </div>

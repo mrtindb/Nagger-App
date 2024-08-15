@@ -56,17 +56,17 @@
                     <form class="my-3" id="change-password-form" action="/account/delete" method="POST">
                       <div class="form-floating mb-3">
                         <input placeholder="Enter old password" class="form-control" type="password" name="passwordOld"
-                          id="passwordOld" required>
+                          id="passwordOld" minlength="8" maxlength="49" required>
                         <label for="passwordOld">Old password</label>
                       </div>
                       <div class="form-floating mb-3">
                         <input placeholder="Enter new password" class="form-control" type="password" name="passwordNew"
-                          id="passwordNew" required minlength="8">
+                          id="passwordNew" maxlength="49" required minlength="8">
                         <label for="passwordNew">New password</label>
                       </div>
                       <div class="form-floating mb-3">
                         <input placeholder="Confirm new password" class="form-control" type="password"
-                          name="passwordConf" id="passwordConf" required minlength="8">
+                          name="passwordConf" maxlength="49" id="passwordConf" required minlength="8">
                         <label for="passwordConf">Confirm new password</label>
                       </div>
                       <button type="button" class="btn btn-success mb-3" id="changeButton">Change Password</button>

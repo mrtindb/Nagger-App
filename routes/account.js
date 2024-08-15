@@ -4,26 +4,39 @@
 const express = require('express');
 const routes = express.Router();
 const jwtMiddleware = require('../jwtMiddleware');
-const { cookie } = require('express-validator');
 const { comparePasswords, hashPassword } = require('../passwordhashing');
 const { getAccountDetails, extractUserPassword, changePassword, accountEditDate } = require('../database');
+const { cookie, body, validationResult, matchedData } = require('express-validator');
 
-routes.get('/', cookie('jwt').notEmpty().bail().isString().escape(), jwtMiddleware, async (req, res) => {
-    let userId = req.user.userId;
+//Validated
+routes.get('/', cookie('jwt').notEmpty().bail().isString(), jwtMiddleware, async (req, res) => {
+    //Comes from jwtMiddleware
+    let userId = matchedData(user).userId;
     let accountDetails = await getAccountDetails(userId);
     let creationDate = accountDetails.acc_created_on;
     let editDate = accountDetails.acc_edited_on || 'never';
     let naggerCount = accountDetails.nagger_last_id+1;
     creationDate = creationDate.toISOString().split('T')[0].split('-').reverse().join('/');
-    editDate = editDate.toISOString().split('T')[0].split('-').reverse().join('/');
+    editDate = editDate.toISOString().split('T')[0].split('-').reverse().join('/') || 'never';
     res.render('account', { creationDate, editDate, naggerCount });
 });
-routes.post('/', cookie('jwt').notEmpty().bail().isString().escape(), jwtMiddleware, async (req, res) => {
+
+//Validated
+routes.post('/', 
+    //Validation logic
+    cookie('jwt').notEmpty().bail().isString(),
+    body('oldPassword').isString().isLength({ min: 8, max: 49 }),
+    body('newPassword').isString().isLength({ min: 8, max: 49 }),
+
+    jwtMiddleware, async (req, res) => {
     //Comes from jwtMiddleware
-    const user = req.user;
-    const body = req.body;
-    const oldPassword = body.oldPassword;
-    const newPassword = body.newPassword;
+    const user = matchedData(user);
+
+    if(validationResult(req).isEmpty() === false) {
+        res.status(400).send('Bad Request');
+        return;
+    }
+    const { oldPassword, newPassword } = matchedData(req);
 
     const userData = await extractUserPassword(user.username, user.email);
     const match = await comparePasswords(oldPassword, userData[0].password);
