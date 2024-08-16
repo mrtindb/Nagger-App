@@ -1,6 +1,7 @@
 
 'use strict';
 
+require('dotenv').config();
 const express = require('express');
 const routes = express.Router();
 const createJwt = require('../createjwt');
