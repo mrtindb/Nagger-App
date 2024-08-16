@@ -32,13 +32,15 @@ routes.post('/',
         const recaptchaResponse = req.body['g-recaptcha-response'];
         console.log(recaptchaResponse);
         const secret = process.env.RECAPTCHA_SECRET_KEY;
+        const params = new URLSearchParams();
+        params.append('secret', secret);
+        params.append('response', recaptchaResponse);
         fetch(`https://www.google.com/recaptcha/api/siteverify`, {
             method: 'POST',
-            body: JSON.stringify({
-                secret: secret,
-                response: recaptchaResponse,
-                remoteip: req.ip
-            })
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params.toString()
         }).then(res => res.json()).then(json => {console.log(json);});
   
         //TODO: Add validation for incoming data
