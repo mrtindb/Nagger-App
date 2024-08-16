@@ -35,6 +35,7 @@ routes.post('/',
         const params = new URLSearchParams();
         params.append('secret', secret);
         params.append('response', recaptchaResponse);
+        console.log(secret);
         fetch(`https://www.google.com/recaptcha/api/siteverify`, {
             method: 'POST',
             headers: {
