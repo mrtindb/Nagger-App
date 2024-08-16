@@ -3,6 +3,12 @@
 <%- include('partials/head'); %>
 <head>
   <link rel="stylesheet" href="static/form-styles.css">
+  <script src="https://www.google.com/recaptcha/api.js"></script>
+  <script>
+    function onSubmit(token) {
+      document.getElementById("submit-form").submit();
+    }
+  </script>
 </head>
 <body data-bs-theme="light">
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
@@ -33,7 +39,7 @@
       <!-- Main Content -->
       <main class="col">
         <div class="container mx-auto mt-4" id="register-form-container">
-          <form method="POST" action="/register">
+          <form method="POST" action="/register" id="submit-form">
             <h1 class="h3 mb-3 fw-normal">Register</h1>
             
             <div class="mb-3 form-floating">
@@ -61,7 +67,10 @@
             </div>
             <% } %>
 
-            <button type="submit" class="btn btn-success">Create Account</button>
+            <button class="g-recaptcha btn btn-success" 
+            data-sitekey= "6Lfh6icqAAAAAJeo6_k1ecHiyiD6A3LNtSzYQPr2"
+            data-callback='onSubmit' 
+            data-action='submit'>Create Account</button>
           </form>
         </div>
       </main>

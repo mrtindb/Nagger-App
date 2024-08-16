@@ -17,7 +17,7 @@ routes.get('/',
     cookie('deviceID').isString().isUUID(),
     
     async (req, res) => {
-
+        console.log(req.ip);
         const userData = req.user; //Coming from jwtMiddleware
         const naggers = await getUserNaggers(userData.userId);
         let deviceID = req.cookies.deviceID || "";
