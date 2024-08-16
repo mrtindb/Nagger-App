@@ -31,7 +31,7 @@ routes.post('/',
         const { username, email, password } = matchedData(req);
         const recaptchaResponse = req.body['g-recaptcha-response'];
         console.log(recaptchaResponse);
-        const secret = process.env.RECAPTCHA_SECRET_KEY;
+        const secret = process.env.RECAPTCHA_SECRET;
         const params = new URLSearchParams();
         params.append('secret', secret);
         params.append('response', recaptchaResponse);
