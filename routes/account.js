@@ -13,10 +13,10 @@ routes.get('/', cookie('jwt').notEmpty().bail().isString(), jwtMiddleware, async
     //Comes from jwtMiddleware
     let userId = req.user.userId;
     let accountDetails = await getAccountDetails(userId);
-    let creationDate = accountDetails.acc_created_on;
+    let creationDate = accountDetails.acc_created_on || 'never';
     let editDate = accountDetails.acc_edited_on || 'never';
     let naggerCount = accountDetails.nagger_last_id+1;
-    creationDate = creationDate.toISOString().split('T')[0].split('-').reverse().join('/');
+    if(creationDate!=='never') creationDate = creationDate.toISOString().split('T')[0].split('-').reverse().join('/');
     if(editDate!=='never') editDate = editDate.toISOString().split('T')[0].split('-').reverse().join('/');
     res.render('account', { creationDate, editDate, naggerCount });
 });

@@ -139,6 +139,7 @@ async function deleteNagger(userId, naggerId) {
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
+            if(result.length === 0) { resolve('ok'); return; }
             let naggerCollection = JSON.parse(result[0].user_data);
             let newNaggerCollection = naggerCollection.filter(nagger => nagger.naggerId != naggerId);
             con.query(`UPDATE users SET user_data = ? WHERE userId = ?`,
@@ -157,6 +158,7 @@ async function alterNagger(userId, naggerId, newNagger) {
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
+            if(result.length === 0) { resolve('ok'); return; }
             let naggerCollection = JSON.parse(result[0].user_data);
             let arrayIndex = naggerCollection.findIndex(a => a.naggerId == naggerId);
             naggerCollection[arrayIndex].title = newNagger.title;
@@ -178,6 +180,7 @@ function updateNextExecutionTime(userId, naggerId) {
     return new Promise((resolve, reject) => {
         con.query(`SELECT user_data FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
+            if(result.length === 0) { resolve('ok'); return; }
             let naggerCollection = JSON.parse(result[0].user_data);
             let nagger = naggerCollection.filter(nagger => nagger.naggerId == naggerId)[0];
             nagger.nextExecution = nextExecution(nagger.severity);
@@ -240,7 +243,8 @@ async function extractDevices(userId) {
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT devices FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
-            resolve(result[0].devices);
+            if(result.length === 0) resolve('[]');
+            else resolve(result[0].devices);
         });
     });
     return await promise;
@@ -332,7 +336,8 @@ async function getAccountDetails(userId) {
     let promise = new Promise((resolve, reject) => {
         con.query(`SELECT acc_created_on, acc_edited_on, nagger_last_id FROM users WHERE userId = ?`, [userId], function (err, result) {
             if (err) throw err;
-            resolve(result[0]);
+            if(result.length === 0) resolve({acc_created_on: undefined, acc_edited_on: undefined, nagger_last_id: 0});
+            else resolve(result[0]);
         });
     });
     return await promise;
