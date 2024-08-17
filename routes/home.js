@@ -17,7 +17,6 @@ routes.get('/',
     cookie('deviceID').isString().isUUID(),
     
     async (req, res) => {
-        console.log(req.ip);
         const userData = req.user; //Coming from jwtMiddleware
         const naggers = await getUserNaggers(userData.userId);
         let deviceID = req.cookies.deviceID || "";
@@ -144,7 +143,6 @@ routes.put('/subscribe',
     jwtMiddleware, 
     async (req, res) => {
     if(!validationResult(req).isEmpty()) {
-        console.log(validationResult(req).array());
         res.status(400).send('Bad Request');
         return;
     }

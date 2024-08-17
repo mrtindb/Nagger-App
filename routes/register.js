@@ -13,7 +13,7 @@ const fetch = require('node-fetch');
 
 //Validated
 routes.get('/', async (req, res) => {
-    res.render('register', { errorFlag: false, errorMessage: "", siteKey: process.env.RECAPTCHA_SITE_KEY });
+    res.render('register', { errorFlag: false, errorMessage: "", siteKey: process.env.RECAPTCHA_SITE });
 });
 
 //Validated
@@ -24,32 +24,42 @@ routes.post('/',
     body('password').isString().isLength({ min: 8, max: 49 }),
 
     async (req, res) => {
-
+        //Check if input is valid
         if (!validationResult(req).isEmpty()) {
-            res.render('register', { errorFlag: true, errorMessage: "Invalid input", siteKey: process.env.RECAPTCHA_SITE_KEY });
+            res.render('register', { errorFlag: true, errorMessage: "Invalid input", siteKey: process.env.RECAPTCHA_SITE });
             return;
         }
-        const { username, email, password } = matchedData(req);
+
+
+        //Recaptcha logic
         const recaptchaResponse = req.body['g-recaptcha-response'];
-        console.log(recaptchaResponse);
         const secret = process.env.RECAPTCHA_SECRET;
         const params = new URLSearchParams();
         params.append('secret', secret);
         params.append('response', recaptchaResponse);
-        console.log(secret);
-        fetch(`https://www.google.com/recaptcha/api/siteverify`, {
+        let response = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: params.toString()
-        }).then(res => res.json()).then(json => {console.log(json);});
-  
-        //TODO: Add validation for incoming data
-        let emailExists = await checkEmailAvailability(email);
+        });
+        const responseJson = await response.json();
+        if(!responseJson.success) {
+            res.render('register', { errorFlag: true, errorMessage: "Recaptcha failed. Please try again", siteKey: process.env.RECAPTCHA_SITE });
+            return;
+        }
+        if(responseJson.score < 0.5) {
+            res.render('register', { errorFlag: true, errorMessage: "Recaptcha failed. Please try again", siteKey: process.env.RECAPTCHA_SITE });
+            return;
+        }
 
+
+        const { username, email, password } = matchedData(req);
+        let emailExists = await checkEmailAvailability(email);
+        //Check if email is already in use
         if (!emailExists) {
-            res.render('register', { errorFlag: true, errorMessage: "Email already in use", siteKey: process.env.RECAPTCHA_SITE_KEY });
+            res.render('register', { errorFlag: true, errorMessage: "Email already in use" , siteKey: process.env.RECAPTCHA_SITE });
             return;
         }
 

@@ -22,7 +22,7 @@ routes.get('/',
 
         let deviceID = req.cookies.deviceID || "";
         let devices = JSON.parse(await extractDevices(req.user.userId)) || [];
-
+        console.log(devices);
         // Check if the deviceID is in the list of devices
         let x = devices.filter(device => device.deviceId === deviceID);
         let set = true;

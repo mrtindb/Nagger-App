@@ -34,4 +34,5 @@ function updateLinks() {
   document.getElementById('setup-link').setAttribute('href', `/setup?theme=${theme}`);
   document.getElementById('devices-link').setAttribute('href', `/devices?theme=${theme}`);
   document.getElementById('about-link').setAttribute('href', `/about?theme=${theme}`);
+  document.getElementById('about-footer-link').setAttribute('href', `/about?theme=${theme}`);
 }
