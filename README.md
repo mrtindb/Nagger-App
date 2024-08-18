@@ -74,7 +74,7 @@ Once this setup is completed, the user can start adding Naggers from the Home pa
 <img src='img/home_mobile.png' alt='home mobile'>
 <br>
 <br>
-<img scr='img/addnagger.png' alt='adding nagger'>
+<img src='img/addnagger.png' alt='adding nagger' width=600>
 
 
 
