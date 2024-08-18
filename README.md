@@ -32,17 +32,33 @@
 </details>
 
 ## About this Project
-<a id="about-the-project"></a>Nagger is a web-based application that is designed to be used to set reminders for small and easily forgettable tasks that we face throughout the day, such as wishing happy birthday to a distant relative or an acquaintance.
+<a id="about-the-project"></a>Nagger is a web-based application that is designed to be used to set short-term reminders for small and easily forgettable tasks that we face throughout the day, such as wishing happy birthday to a distant relative or an acquaintance. You can see a demo video below.
 
 ### <a id='built-with'></a>Built with
 
 * [![Bootstrap][Bootstrap.com]][Bootstrap-url]
 * [![Javascript][js.com]][js-url]
+* [![Nodejs][node.com]][node-url]
 * [![Express][Express.com]][Express-url]
 * [![MySQL][mysql.com]][mysql-url]
-* [![Amazon AWS][AWS.com]][AWS-url]
+
+## Features
+* <strong>Notifications</strong> - the main feature, web push notifications, send periodically on a user-customizable time interval, based on the Naggers that the user has set. Naggers can be edited after they have been already added.
+* <strong>Accounts</strong> - the application has a variety of account features, which include:
+  * Registration and login
+  * Change of password from within the page
+  * Password reset with email and URL token
+* <strong>Devices</strong> - every device that logs in in a given account gets saved in the user's profile. This way a Nagger notification can be sent to all of the user's devices. Which device receives notifications is a subject to customization as well.
+* <strong>Theme</strong> - the user can switch between light and dark theme.
+
+## Security features
+* <strong>HTTPS</strong> - the application works only with HTTPS, meaning that sensitive user data is protected enroute.
+* <strong>Password hashing (10 rounds) with salt</strong> - ensuring that even if the database gets leaked, user passwords will not be stolen.
+* <strong>reCAPTCHA v3</strong> for sensitive forms. This technology protects the server from spam and bot requests.
 
 
+## Usage
+The front-end of this application is accessible from a browser under the specified domain (currently https://nagnag.me)
 
 
 
@@ -57,3 +73,5 @@
 [mysql-url]: https://www.mysql.com/
 [js.com]: https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black
 [js-url]: https://www.w3schools.com/js/
+[node.com]: https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white
+[node-url]: https://nodejs.org/en
