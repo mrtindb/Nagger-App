@@ -55,11 +55,17 @@
 * <strong>HTTPS</strong> - the application works only with HTTPS, meaning that sensitive user data is protected enroute.
 * <strong>Password hashing (10 rounds) with salt</strong> - ensuring that even if the database gets leaked, user passwords will not be stolen.
 * <strong>reCAPTCHA v3</strong> for sensitive forms. This technology protects the server from spam and bot requests.
+* Strict <strong>password reset</strong> logic featuring a 40-character long URL token with limited validity, ensuring that this commonly attacked place is well-protected.
 
 
 ## Usage
-The front-end of this application is accessible from a browser under the specified domain (currently https://nagnag.me)
-
+The front-end of this application is accessible from a browser under the specified domain (currently https://nagnag.me). After account creation (or login), the user must enable push notifications for the current browser from the 'Setup' tab. This action registeres the device (browser) in the list of user's devices eligible for receiving notifications from Naggers.
+<br>
+<br>
+<img src='img/setup.png' alt='setup page'>
+<br>
+<br>
+<img src='img/devices.png' alt='setup page'>
 
 
 
