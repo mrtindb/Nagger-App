@@ -79,7 +79,9 @@ routes.get('/:to',
             res.render('invalid-token');
             return;
         }
-        res.cookie('token', token, { secure: true, httpOnly: true });
+        let expiryDate = new Date();
+        expiryDate.setMinutes(expiryDate.getMinutes() + 15);
+        res.cookie('token', token, { secure: true, httpOnly: true , expires: expiryDate});
         res.render('new-password');
 
     });
