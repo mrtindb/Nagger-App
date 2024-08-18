@@ -32,7 +32,7 @@
 </details>
 
 ## About this Project
-<a id="about-the-project"></a>Nagger is a web-based application that is designed to be used to set short-term reminders for small and easily forgettable tasks that we face throughout the day, such as wishing happy birthday to a distant relative or an acquaintance. You can see a demo video below.
+<a id="about-the-project"></a>Nagger is a web-based application that is designed to be used to set short-term reminders for small and easily forgettable tasks that we face throughout the day, such as wishing happy birthday to a distant relative or an acquaintance.
 
 ### <a id='built-with'></a>Built with
 
@@ -65,9 +65,25 @@ The front-end of this application is accessible from a browser under the specifi
 <img src='img/setup.png' alt='setup page'>
 <br>
 <br>
-<img src='img/devices.png' alt='setup page'>
+<img src='img/devices.png' alt='devices page'>
+<br>
+<br>
+Once this setup is completed, the user can start adding Naggers from the Home page.
+<br>
+<br>
+<img src='img/home_mobile.png' alt='home mobile'>
+<br>
+<br>
+<img src='img/addnagger.png' alt='adding nagger' width=600>
+<br>
+<br>
+For each Nagger that is active on the home page, the user will receive a notification on the enabled devices.
 
+## Possible new features
+* Native front-end applications for Android and iOS that will greatly enhance the user experience when it comes to the notification feature.
 
+## Contact
+If you have any questions regarding this project, you can write me an email at nagger.web@gmail.com or martin.dobrew@gmail.com
 
 [Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
 [Bootstrap-url]: https://getbootstrap.com
