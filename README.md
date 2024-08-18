@@ -34,12 +34,15 @@
 ## About this Project
 <a id="about-the-project"></a>Nagger is a web-based application that is designed to be used to set reminders for small and easily forgettable tasks that we face throughout the day, such as wishing happy birthday to a distant relative or an acquaintance.
 
-### Built with
+### <a id='built-with'></a>Built with
 
 * [![Bootstrap][Bootstrap.com]][Bootstrap-url]
+* [![Javascript][js.com]][js-url]
 * [![Express][Express.com]][Express-url]
-* [![Amazon AWS][AWS.com]][AWS-url]
 * [![MySQL][mysql.com]][mysql-url]
+* [![Amazon AWS][AWS.com]][AWS-url]
+
+
 
 
 
@@ -52,3 +55,5 @@
 [AWS-url]: https://aws.amazon.com/
 [mysql.com]: https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white
 [mysql-url]: https://www.mysql.com/
+[js.com]: https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black
+[js-url]: https://www.w3schools.com/js/
