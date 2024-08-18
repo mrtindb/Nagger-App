@@ -65,7 +65,16 @@ The front-end of this application is accessible from a browser under the specifi
 <img src='img/setup.png' alt='setup page'>
 <br>
 <br>
-<img src='img/devices.png' alt='setup page'>
+<img src='img/devices.png' alt='devices page'>
+<br>
+<br>
+Once this setup is completed, the user can start adding Naggers from the Home page.
+<br>
+<br>
+<img src='img/home_mobile.png' alt='home mobile'>
+<br>
+<br>
+<img scr='img/addnagger.png' alt='adding nagger'>
 
 
 
