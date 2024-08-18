@@ -32,7 +32,7 @@
 </details>
 
 ## About this Project
-<a id="about-the-project"></a>Nagger is a web-based application that is designed to be used to set short-term reminders for small and easily forgettable tasks that we face throughout the day, such as wishing happy birthday to a distant relative or an acquaintance. You can see a demo video below.
+<a id="about-the-project"></a>Nagger is a web-based application that is designed to be used to set short-term reminders for small and easily forgettable tasks that we face throughout the day, such as wishing happy birthday to a distant relative or an acquaintance.
 
 ### <a id='built-with'></a>Built with
 
