@@ -75,8 +75,15 @@ Once this setup is completed, the user can start adding Naggers from the Home pa
 <br>
 <br>
 <img src='img/addnagger.png' alt='adding nagger' width=600>
+<br>
+<br>
+For each Nagger that is active on the home page, the user will receive a notification on the enabled devices.
 
+## Possible new features
+* Native front-end applications for Android and iOS that will greatly enhance the user experience when it comes to the notification feature.
 
+## Contact
+If you have any questions regarding this project, you can write me an email at nagger.web@gmail.com or martin.dobrew@gmail.com
 
 [Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
 [Bootstrap-url]: https://getbootstrap.com
