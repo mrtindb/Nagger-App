@@ -59,7 +59,7 @@
 
 
 ## Usage
-The front-end of this application is accessible from a browser under the specified domain (currently https://nagnag.me). After account creation (or login), the user must enable push notifications for the current browser from the 'Setup' tab. This action registeres the device (browser) in the list of user's devices eligible for receiving notifications from Naggers.
+The front-end of this application is accessible from a browser under the specified domain (it was hosted on https://nagnag.me using Amazon AWS). After account creation (or login), the user must enable push notifications for the current browser from the 'Setup' tab. This action registeres the device (browser) in the list of user's devices eligible for receiving notifications from Naggers.
 <br>
 <br>
 <img src='img/setup.png' alt='setup page'>
