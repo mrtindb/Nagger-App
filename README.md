@@ -97,3 +97,7 @@ If you have any questions regarding this project, you can write me an email at n
 [js-url]: https://www.w3schools.com/js/
 [node.com]: https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white
 [node-url]: https://nodejs.org/en
+
+> [!NOTE]
+> As of October 2024, the default domain redirects to this Github Repository.
+
