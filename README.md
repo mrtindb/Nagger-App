@@ -59,6 +59,9 @@
 
 
 ## Usage
+> [!NOTE]
+> As of October 2024, the default domain redirects to this Github Repository.
+
 The front-end of this application is accessible from a browser under the specified domain (it was hosted on https://nagnag.me using Amazon AWS, together with the MySQL Database). After account creation (or login), the user must enable push notifications for the current browser from the 'Setup' tab. This action registeres the device (browser) in the list of user's devices eligible for receiving notifications from Naggers.
 <br>
 <br>
@@ -98,6 +101,5 @@ If you have any questions regarding this project, you can write me an email at n
 [node.com]: https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white
 [node-url]: https://nodejs.org/en
 
-> [!NOTE]
-> As of October 2024, the default domain redirects to this Github Repository.
+
 
