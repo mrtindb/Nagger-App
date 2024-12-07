@@ -39,6 +39,7 @@ export function registerServiceWorker() {
     navigator.serviceWorker.ready.then(function (registration) {
       return registration.pushManager.subscribe({
         userVisibleOnly: true,
+          //THIS IS A PUBLIC KEY
         applicationServerKey: urlBase64ToUint8Array('BDc4tPwlYDOyk7AWjeVOWnnlHMh0_IieE7uMb0g-ertvHKhf-sFKgR5_enTsTU5Pzpxq2rreqkka3T0-MsY5Q5Y')
       });
     }).then(async function (subscription) {
